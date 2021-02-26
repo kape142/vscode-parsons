@@ -1,5 +1,5 @@
-import Fetcher from "../Fetcher";
-import {Exercise} from "../model";
+import {Exercise, Fetcher} from "../model";
+import {parseExercise} from "../util";
 import "./ParsonViewer.less";
 
 export default class ParsonViewer{
@@ -26,10 +26,10 @@ export default class ParsonViewer{
     updateContent(text: string) {
 		let exercise: Exercise;
 		try {
-			exercise = JSON.parse(text);
-		} catch {
+			exercise = parseExercise(text);
+		} catch(error: any) {
 			this.code.style.display = 'none';
-			this.errorContainer.innerText = 'Error: Document is not valid json for an exercise';
+			this.errorContainer.innerText = 'Error: '+error.message;
 			this.errorContainer.style.display = '';
 			return;
 		}

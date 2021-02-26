@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { getNonce } from './util';
 
 export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 
@@ -74,7 +75,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 		));
 
 		// Use a nonce to whitelist which scripts can be run
-		const nonce = "asdf"; //TODO: generate real nonce
+		const nonce = getNonce(); //TODO: generate real nonce
 
 		return /* html */`
 			<!DOCTYPE html>

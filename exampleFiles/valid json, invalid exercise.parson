@@ -1,13 +1,13 @@
 {
     "name": "intro",
-    "file": [
+    "files": [
         {
             "name": "HelloWorld.java",
             "text": "public class HelloWorld {\n    public static void main() {\n        System.out.println(\"Hello, World\");\n    }\n}",
             "gaps": [
                 {
                     "line": 2,
-                    "position": 28,
+                    "position": -23,
                     "width": 13
                 },
                 {

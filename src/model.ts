@@ -19,3 +19,8 @@ export interface Gap{
     position: number
     width: number
 }
+
+export interface Fetcher{
+    log: (data: string | object) => void
+    post: (data: string | object) => void
+}

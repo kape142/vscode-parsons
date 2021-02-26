@@ -1,4 +1,4 @@
-{:
+{
     "name": "test",
     "files": [
         {
@@ -9,7 +9,7 @@
                     "line": 2,
                     "position": 28,
                     "width": 13
-                },
+                },:
                 {
                     "line": 3,
                     "position": 29,

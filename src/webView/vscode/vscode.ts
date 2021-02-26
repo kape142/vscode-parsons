@@ -1,5 +1,8 @@
 import { ThemeIcon } from 'vscode';
-import ParsonViewer from './ParsonViewer/ParsonViewer';
+import ParsonViewer from '../ParsonViewer/ParsonViewer';
+
+import "./vscode.less";
+import "./reset.less";
 
 // @ts-ignore
 const vscode = acquireVsCodeApi();

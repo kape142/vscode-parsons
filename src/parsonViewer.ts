@@ -69,14 +69,8 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 		const scriptUri = webview.asWebviewUri(vscode.Uri.file(
 			path.join(this.context.extensionPath, 'dist', 'webView.js')
 		));
-		const styleResetUri = webview.asWebviewUri(vscode.Uri.file(
-			path.join(this.context.extensionPath, 'src', 'webView', 'reset.css')
-		));
-		const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.file(
-			path.join(this.context.extensionPath, 'src', 'webView', 'vscode.css')
-		));
 		const styleMainUri = webview.asWebviewUri(vscode.Uri.file(
-			path.join(this.context.extensionPath, 'src', 'webView', 'ParsonViewer', 'ParsonViewer.css')
+			path.join(this.context.extensionPath, 'dist', 'webView.css')
 		));
 
 		// Use a nonce to whitelist which scripts can be run
@@ -95,9 +89,6 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource}; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
 
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-				<link href="${styleResetUri}" rel="stylesheet" />
-				<link href="${styleVSCodeUri}" rel="stylesheet" />
 				<link href="${styleMainUri}" rel="stylesheet" />
 
 				<title>Parsons viewer</title>

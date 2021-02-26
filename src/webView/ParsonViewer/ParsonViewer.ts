@@ -1,5 +1,6 @@
 import Fetcher from "../Fetcher";
 import {Exercise} from "../model";
+import "./ParsonViewer.less";
 
 export default class ParsonViewer{
     private fetcher: Fetcher;

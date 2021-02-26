@@ -2,6 +2,8 @@
 
 'use strict';
 
+// @ts-ignore
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
 /**@type {import('webpack').Configuration}*/
@@ -11,7 +13,7 @@ const config = {
 
   entry: {
     extension: './src/extension.ts', 
-    webview: './src/webView/webView.ts'
+    webview: './src/webView/vscode/vscode.ts'
   }, // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
   output: {
     // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
@@ -37,8 +39,18 @@ const config = {
             loader: 'ts-loader'
           }
         ]
+      },
+      {
+        test: /\.less$/,
+        exclude: /node_modules/,
+        use: [ 
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'less-loader'
+        ]
       }
     ]
-  }
+  },
+  plugins: [new MiniCssExtractPlugin()]
 };
 module.exports = config;

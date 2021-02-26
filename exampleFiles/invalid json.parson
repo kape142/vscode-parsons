@@ -1,0 +1,30 @@
+{:
+    "name": "test",
+    "files": [
+        {
+            "name": "HelloWorld.java",
+            "text": "public class HelloWorld {\n    public static void main() {\n        System.out.println(\"Hello, World\");\n    }\n}",
+            "gaps": [
+                {
+                    "line": 2,
+                    "position": 28,
+                    "width": 13
+                },
+                {
+                    "line": 3,
+                    "position": 29,
+                    "width": 13
+                }
+                
+            ]
+        }
+    ],
+    "snippets": [
+        {
+            "text": "String[] args"
+        },
+        {
+            "text": "abcdef"
+        }
+    ]
+}

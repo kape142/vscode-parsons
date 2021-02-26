@@ -1,6 +1,8 @@
 import {Exercise, Fetcher} from "../model";
 import {parseExercise} from "../util";
 import "./ParsonViewer.less";
+import "./highlight.less";
+import * as highlight from 'highlight.js';
 
 export default class ParsonViewer{
     private fetcher: Fetcher;
@@ -40,10 +42,18 @@ export default class ParsonViewer{
 		this.code.innerHTML = '';
         this.fetcher.log(exercise);
 		for (const file of exercise.files || []) {
+            const highlightedCode = highlight.highlight("java", file.text, true);
+            this.fetcher.log("highlighting");
+            this.fetcher.log(highlightedCode.value);
+            this.fetcher.log(highlightedCode.language!!);
+            this.fetcher.log(""+highlightedCode.relevance);
+            this.fetcher.log(""+highlightedCode.illegal);
+            console.log("aosdf", highlightedCode);
             const element = document.createElement('div');
             element.className = 'file';
 			this.code.appendChild(element);
-
+            element.innerHTML = highlightedCode.value;
+            /*
             const text = document.createElement('div');
 			text.className = 'java';
             const lines = file.text.split("\n");
@@ -65,7 +75,7 @@ export default class ParsonViewer{
                     text.appendChild(this.createCodeLineSegment(line));
                 }
             }
-            element.appendChild(text);
+            element.appendChild(text);*/
 
 		}
 

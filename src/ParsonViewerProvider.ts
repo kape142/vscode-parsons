@@ -91,6 +91,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<link href="${styleMainUri}" rel="stylesheet" />
+				<link href="${styleMainUri}" rel="stylesheet" >
 
 				<title>Parsons viewer</title>
 			</head>

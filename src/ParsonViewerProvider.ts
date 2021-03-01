@@ -75,7 +75,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 		));
 
 		// Use a nonce to whitelist which scripts can be run
-		const nonce = getNonce(); //TODO: generate real nonce
+		const nonce = getNonce();
 
 		return /* html */`
 			<!DOCTYPE html>
@@ -96,7 +96,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 				<title>Parsons viewer</title>
 			</head>
 			<body>
-				<div id="code"></div>
+				<div id="code" class="hljs"></div>
                 <div id="snippets"></div>
 				<div id="error" style="display:"></div>
 				<script nonce="${nonce}" src="${scriptUri}"></script>

@@ -3,19 +3,16 @@
     "files": [
         {
             "name": "HelloWorld.java",
-            "text": "public class HelloWorld {\n    public static void main() {\n        System.out.println(\"Hello, World\");\n    }\n}",
+            "text": "public class HelloWorld {\n    public static void main($parson{main})) {\n        System.out.println(\"Hello, $parson{hello}\");\n    }\n}",
             "gaps": [
                 {
-                    "line": 2,
-                    "position": 28,
+                    "id": "main",
                     "width": 13
                 },
                 {
-                    "line": 3,
-                    "position": 29,
-                    "width": 13
+                    "id": "hello",
+                    "width": 5
                 }
-                
             ]
         }
     ],
@@ -24,7 +21,7 @@
             "text": "String[] args"
         },
         {
-            "text": "abcdef"
+            "text": "World"
         }
     ]
 }

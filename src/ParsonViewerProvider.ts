@@ -87,7 +87,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 				Use a content security policy to only allow loading images from https or from our extension directory,
 				and only allow scripts that have a specific nonce.
 				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource}; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource}; style-src ${webview.cspSource} 'nonce-${nonce}'; script-src 'nonce-${nonce}';">
 
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<link href="${styleMainUri}" rel="stylesheet" />
@@ -98,7 +98,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 			<body>
 				<div id="code" class="hljs"></div>
                 <div id="snippets"></div>
-				<div id="error" style="display:"></div>
+				<div id="error"></div>
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;

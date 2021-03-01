@@ -15,8 +15,7 @@ export interface Snippet{
 }
 
 export interface Gap{
-    line: number
-    position: number
+    id: string
     width: number
 }
 

@@ -1,5 +1,5 @@
-import {Exercise, Fetcher} from "../model";
-import {parseExercise} from "../util";
+import {Exercise, Gap, Fetcher} from "../model";
+import {getNonce, parseExercise} from "../util";
 import "./ParsonViewer.less";
 import "./highlight.less";
 import * as highlight from 'highlight.js';
@@ -32,62 +32,42 @@ export default class ParsonViewer{
 		} catch(error: any) {
 			this.code.style.display = 'none';
 			this.errorContainer.innerText = 'Error: '+error.message;
-			this.errorContainer.style.display = '';
+			//this.errorContainer.style.display = '';
 			return;
 		}
-		this.code.style.display = '';
-		this.errorContainer.style.display = 'none';
+		//this.code.style.display = '';
+		//this.errorContainer.style.display = 'none';
 
 		// Render the code
 		this.code.innerHTML = '';
-        this.fetcher.log(exercise);
 		for (const file of exercise.files || []) {
             const highlightedCode = highlight.highlight("java", file.text, true);
-            this.fetcher.log("highlighting");
-            this.fetcher.log(highlightedCode.value);
-            this.fetcher.log(highlightedCode.language!!);
-            this.fetcher.log(""+highlightedCode.relevance);
-            this.fetcher.log(""+highlightedCode.illegal);
-            console.log("aosdf", highlightedCode);
             const element = document.createElement('div');
             element.className = 'file';
 			this.code.appendChild(element);
-            element.innerHTML = highlightedCode.value;
-            /*
-            const text = document.createElement('div');
-			text.className = 'java';
-            const lines = file.text.split("\n");
-            for(const i in lines){
-                const line = lines[i]+"\n";
-                const mangler = file.gaps.filter(m => Number(m.line) === Number(i)+1);
-                if(mangler.length > 0){
-                    let prev = 0;
-                    for(const m of mangler){
-                        text.appendChild(this.createCodeLineSegment(line.slice(prev, m.position)));
-                        prev = m.position;
-                        let mangel = document.createElement("span");
-                        mangel.className = "mangel";
-                        mangel.style.width = `${m.width*5}px`;
-                        text.appendChild(mangel);
-                    }
-                    text.appendChild(this.createCodeLineSegment(line.slice(prev)));
-                }else{
-                    text.appendChild(this.createCodeLineSegment(line));
-                }
-            }
-            element.appendChild(text);*/
-
+            let innerHTML = highlightedCode.value;
+            file.gaps.forEach(gap => {
+                this.fetcher.log(gap.id);
+                innerHTML = innerHTML.replace(`$parson{${gap.id}}`, this.createGapObject(gap));
+            });
+            this.fetcher.log(innerHTML);
+            element.innerHTML = innerHTML;
 		}
 
         this.snippets.innerHTML = "";
         for(const snip of exercise.snippets){
-            this.fetcher.log(snip);
             let el = document.createElement("div");
             el.className = "snippet";
             el.textContent = snip.text;
             this.snippets.appendChild(el);
         }
 	}
+
+    createGapObject(gap: Gap){
+        let a =  `<span class="gap width-${gap.width}"></span>`;
+        this.fetcher.log(a);
+        return a;
+    }
 
     createCodeLineSegment(line: string){
         const textContent = document.createElement('span');

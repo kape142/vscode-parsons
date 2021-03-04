@@ -32,8 +32,6 @@ window.addEventListener('message', event => {
 });
 
 
-log({message: "abi"});
-
 const state = vscode.getState();
 	if (state) {
         log("state: "+ JSON.stringify(state));

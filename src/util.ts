@@ -1,14 +1,27 @@
 import { Exercise, ExerciseFile, Gap, Snippet } from "./model";
 
-export function getNonce() {
+function* nonceGenerator() {
 	let text = '';
 	const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 	for (let i = 0; i < 32; i++) {
 		text += possible.charAt(Math.floor(Math.random() * possible.length));
 	}
-	return text;
+	while(true){
+        yield text;
+    }
 }
 
+let nonce = nonceGenerator();
+
+export function getNonce(){
+    return nonce.next().value;
+}
+
+
+/* TODO:
+ * Validate that all gap ids are unique
+ * Validate that all gap ids are present in the code and vice versa
+ */
 export function parseExercise(text: string): Exercise{
     const parsed: Exercise = JSON.parse(text);
     verifyExercise(parsed);
@@ -20,7 +33,7 @@ export function verifyExercise(exercise: Exercise){
         if(exercise === undefined){
             throw new Error("Exercise object is not defined");
         }
-        verifyString(exercise.name);
+        verifyString(exercise.name, `name: "${exercise.name}`);
         if(exercise.snippets === undefined){
             throw new Error("snippets of Exercise object is not defined");
         }
@@ -40,8 +53,8 @@ export function verifyExerciseFile(exerciseFile: ExerciseFile){
         if(exerciseFile === undefined){
             throw new Error("ExerciseFile object is not defined");
         }
-        verifyString(exerciseFile.text);
-        verifyString(exerciseFile.name);
+        verifyString(exerciseFile.text, `text: "${exerciseFile.text}`);
+        verifyString(exerciseFile.name, `name: "${exerciseFile.name}`);
         exerciseFile.gaps.forEach(gap=>verifyGap(gap));
     }catch(error: any){
         throw new Error("ExerciseFile object is not valid:\n"+error.message);
@@ -53,7 +66,7 @@ export function verifySnippet(snippet: Snippet){
         if(snippet === undefined){
             throw new Error("Snippet object is not defined");
         }
-        verifyString(snippet.text);
+        verifyString(snippet.text, `text: "${snippet.text}`);
     }catch(error: any){
         throw new Error("Snippet object is not valid:\n"+error.message);
     }
@@ -64,27 +77,36 @@ export function verifyGap(gap: Gap){
         if(gap === undefined){
             throw new Error("Gap object is not defined");
         }
-        if(gap.line < 0){
-            throw new Error("line of Gap is below zero");
+        verifyString(gap.id, `id: "${gap.id}"`, {notOnlyNumbers: true, noSpaces: true});
+        if(gap.width === undefined ||  gap.width <= 0){
+            throw new Error("width of Gap is not a positive number");
         }
-        if(gap.position < 0){
-            throw new Error("position of Gap is below zero");
-        }
-        if(gap.width <= 0){
-            throw new Error("width of Gap is below or equal to zero");
+        if(gap.width > 100){
+            throw new Error("width of Gap is too large (>100)");
         }
     }catch(error: any){
         throw new Error("Gap object is not valid:\n"+error.message);
     }
 }
 
-export function verifyString(string: string){
+export function verifyString(string: string, details: string, options: StringOptions = {}){
     if(string === undefined){
-        throw new Error("string object is not defined");
+        throw new Error(`string ${details} is not defined`);
     }
     if(string.trim().length <= 0){
-        throw new Error("string is empty");
+        throw new Error(`string ${details} is empty`);
     }
+    if(options.noSpaces && /\s/.test(string)){
+        throw new Error(`string ${details} contains whitespace`);
+    }
+    if(options.notOnlyNumbers && !/[A-z]/.test(string)){
+        throw new Error(`string ${details} consists of only numbers`);
+    }
+}
+
+interface StringOptions{
+    notOnlyNumbers?: boolean
+    noSpaces?: boolean
 }
 
 

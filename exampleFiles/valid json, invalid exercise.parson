@@ -6,13 +6,11 @@
             "text": "public class HelloWorld {\n    public static void main() {\n        System.out.println(\"Hello, World\");\n    }\n}",
             "gaps": [
                 {
-                    "line": 2,
-                    "position": -23,
-                    "width": 13
+                    "id": "asid",
+                    "widht": 13
                 },
                 {
-                    "line": 3,
-                    "position": 29,
+                    "id": "asire",
                     "width": 13
                 }
                 

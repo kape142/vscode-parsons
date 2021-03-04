@@ -5,8 +5,12 @@
 }
 
 #snippets{
-    position: absolute;
-    left: 50vw;
+    position: fixed;
+    padding: 10vh, 5vw;
+    left: 70vw;
+    top: 0;
+    border-left: 1px solid grey;
+    height: 100%;
 
 }
 
@@ -18,12 +22,13 @@
     margin: 1px;
 }
 
-.mangel{
-    position: inline-block;
+.gap{
+    display: inline-block;
     background-color: rgb(189, 189, 189);
     border-radius: 10px;
     height: 15pt;
-    min-width: 10px;
+    vertical-align: middle;
+    min-width: 20px;
 }
 
 .snippet{
@@ -33,4 +38,14 @@
     height: 15pt;
     min-width: 10px;
     padding: 1px 4px;
+    text-align: center;
+    margin: 20px;
 }
+
+@widths: range(100);
+
+each(@widths, {
+    .width-@{value} {
+        width: @value * 5pt
+    }
+})

@@ -75,7 +75,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 		));
 
 		// Use a nonce to whitelist which scripts can be run
-		const nonce = getNonce(); //TODO: generate real nonce
+		const nonce = getNonce();
 
 		return /* html */`
 			<!DOCTYPE html>
@@ -87,17 +87,18 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 				Use a content security policy to only allow loading images from https or from our extension directory,
 				and only allow scripts that have a specific nonce.
 				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource}; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource}; style-src ${webview.cspSource} 'nonce-${nonce}'; script-src 'nonce-${nonce}';">
 
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<link href="${styleMainUri}" rel="stylesheet" />
+				<link href="${styleMainUri}" rel="stylesheet" >
 
 				<title>Parsons viewer</title>
 			</head>
 			<body>
-				<div id="code"></div>
+				<div id="code" class="hljs"></div>
                 <div id="snippets"></div>
-				<div id="error" style="display:"></div>
+				<div id="error"></div>
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;

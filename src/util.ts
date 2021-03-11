@@ -1,20 +1,19 @@
-import { Exercise, ExerciseFile, Gap, Snippet } from "./model";
+import { Exercise, ExerciseFile, Gap, Snippet, ExerciseAnswer, SavedExerciseAnswer} from "./model";
 
-function* nonceGenerator() {
-	let text = '';
-	const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-	for (let i = 0; i < 32; i++) {
-		text += possible.charAt(Math.floor(Math.random() * possible.length));
-	}
-	while(true){
-        yield text;
-    }
+
+export let nonce = '';
+const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+for (let i = 0; i < 32; i++) {
+    nonce += possible.charAt(Math.floor(Math.random() * possible.length));
 }
 
-let nonce = nonceGenerator();
-
-export function getNonce(){
-    return nonce.next().value;
+/* TODO:
+ * Validate answers
+ */
+export function parseExerciseAnswer(text: string): ExerciseAnswer{
+    const parsed: ExerciseAnswer = JSON.parse(text);
+    verifyExercise(parsed.exercise);
+    return parsed;
 }
 
 

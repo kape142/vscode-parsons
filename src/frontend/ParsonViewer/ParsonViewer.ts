@@ -1,13 +1,13 @@
-import {Exercise, Gap, Fetcher} from "../model";
-import {getNonce, parseExercise} from "../util";
+import {Exercise, ExerciseAnswer, Gap, Fetcher, Highlighter} from "../../model";
+import {parseExerciseAnswer} from "../../util";
 import "./ParsonViewer.less";
-import "./highlight.less";
-import * as highlight from 'highlight.js';
 
 export default class ParsonViewer{
     private fetcher: Fetcher;
-    constructor(fetcher: Fetcher){
+    private highlighter: Highlighter;
+    constructor(fetcher: Fetcher, highlighter: Highlighter){
         this.fetcher = fetcher;
+        this.highlighter = highlighter;
     }
     
     code: HTMLElement = document.getElementById("code")!!;
@@ -26,26 +26,27 @@ export default class ParsonViewer{
     }
 
     updateContent(text: string) {
-		let exercise: Exercise;
+		let exerciseAnswer: ExerciseAnswer;
 		try {
-			exercise = parseExercise(text);
+			exerciseAnswer = parseExerciseAnswer(text);
 		} catch(error: any) {
 			this.code.style.display = 'none';
 			this.errorContainer.innerText = 'Error: '+error.message;
 			//this.errorContainer.style.display = '';
 			return;
 		}
+        const exercise = exerciseAnswer.exercise;
 		//this.code.style.display = '';
 		//this.errorContainer.style.display = 'none';
 
 		// Render the code
 		this.code.innerHTML = '';
-		for (const file of exercise.files || []) {
-            const highlightedCode = highlight.highlight("java", file.text, true);
+		for (const file of exercise.files) {
+            const highlightedCode = this.highlighter.addHighlighting("java", file.text);
             const element = document.createElement('div');
             element.className = 'file';
 			this.code.appendChild(element);
-            let innerHTML = highlightedCode.value;
+            let innerHTML = highlightedCode;
             file.gaps.forEach(gap => {
                 this.fetcher.log(gap.id);
                 innerHTML = innerHTML.replace(`$parson{${gap.id}}`, this.createGapObject(gap));
@@ -61,10 +62,19 @@ export default class ParsonViewer{
             el.textContent = snip.text;
             this.snippets.appendChild(el);
         }
+        
+        this.fetcher.log(exerciseAnswer);
+        for(const answer of exerciseAnswer.answers){
+            let el = document.getElementById(`gap-${answer.gap.id}`);
+            if(el){
+                el.classList.add("hidden");
+                el.innerText = answer.snippet.text;
+            }
+        }
 	}
 
     createGapObject(gap: Gap){
-        let a =  `<span class="gap width-${gap.width}"></span>`;
+        let a =  `<span id="gap-${gap.id}" class="gap width-${gap.width}"> </span>`;
         this.fetcher.log(a);
         return a;
     }

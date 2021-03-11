@@ -1,6 +1,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { getNonce } from './util';
+import { nonce } from '../util';
+import { validateFile } from './FileReader';
+
 
 export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 
@@ -28,9 +30,10 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
         
 		webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview);
 		function updateWebview() {
+			const text = validateFile(document.getText(), path.join(document.fileName, '..', '..'));
 			webviewPanel.webview.postMessage({
 				type: 'update',
-				text: document.getText(),
+				text,
 			});
 		}
 
@@ -56,7 +59,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 		// Receive message from the webview.
 		webviewPanel.webview.onDidReceiveMessage(e => {
 			switch (e.type) {
-				case 'debug':
+				case 'log':
 					console.log(e.text);
                     return;
 			}
@@ -73,9 +76,6 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 		const styleMainUri = webview.asWebviewUri(vscode.Uri.file(
 			path.join(this.context.extensionPath, 'dist', 'webView.css')
 		));
-
-		// Use a nonce to whitelist which scripts can be run
-		const nonce = getNonce();
 
 		return /* html */`
 			<!DOCTYPE html>

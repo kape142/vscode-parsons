@@ -1,5 +1,6 @@
 import {Exercise, ExerciseAnswer, Gap, Fetcher, Highlighter} from "../../model";
 import {parseExerciseAnswer} from "../../util";
+import * as elements from 'typed-html';
 import "./ParsonViewer.less";
 
 export default class ParsonViewer{
@@ -74,7 +75,7 @@ export default class ParsonViewer{
 	}
 
     createGapObject(gap: Gap){
-        let a =  `<span id="gap-${gap.id}" class="gap width-${gap.width}"> </span>`;
+        let a =  <span id={`gap-${gap.id}`} class={`gap width-${gap.width}`}> </span>;
         this.fetcher.log(a);
         return a;
     }

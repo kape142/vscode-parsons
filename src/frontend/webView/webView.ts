@@ -1,4 +1,3 @@
-import { ThemeIcon } from 'vscode';
 import {Fetcher, Highlighter} from "../../model";
 import ParsonViewer from '../ParsonViewer/ParsonViewer';
 import Highlight from "../Highlight/Highlight";

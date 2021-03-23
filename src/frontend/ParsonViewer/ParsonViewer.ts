@@ -1,5 +1,5 @@
-import {Exercise, ExerciseAnswer, Gap, Fetcher, Highlighter} from "../../model";
-import {parseExerciseAnswer} from "../../util";
+import {Exercise, ExerciseAnswer, Gap, Fetcher, Highlighter, Snippet, Answer} from "../../model";
+import {parseExerciseAnswer, ElementMap} from "../../util";
 import "./ParsonViewer.less";
 
 export default class ParsonViewer{
@@ -13,6 +13,10 @@ export default class ParsonViewer{
     code: HTMLElement = document.getElementById("code")!!;
     snippets: HTMLElement = document.getElementById("snippets")!!;
     errorContainer: HTMLElement = document.getElementById("error")!!;
+
+    selectedSnippet?: Snippet;
+
+    snippetMap: ElementMap = {};
     
 
     message(message: {type: string, text: string}): void{
@@ -60,17 +64,48 @@ export default class ParsonViewer{
             let el = document.createElement("div");
             el.className = "snippet";
             el.textContent = snip.text;
+            el.onclick = (event)=>{
+                if(this.selectedSnippet){
+                    this.snippetMap[this.selectedSnippet.text].classList.remove("snippet-selected");
+                    if(this.selectedSnippet.text === snip.text){
+                        this.selectedSnippet = undefined;
+                        return;
+                    }
+                }
+                this.selectedSnippet = snip;
+                el.classList.add("snippet-selected");
+            };
             this.snippets.appendChild(el);
+            this.snippetMap[snip.text] = el;
         }
         
         this.fetcher.log(exerciseAnswer);
         for(const answer of exerciseAnswer.answers){
             let el = document.getElementById(`gap-${answer.gap.id}`);
             if(el){
-                el.classList.add("hidden");
+                this.snippetMap[answer.snippet.text].style.display = "none";
+                el.classList.add("filled");
                 el.innerText = answer.snippet.text;
             }
         }
+
+        exerciseAnswer.exercise.files.forEach(file => {
+            file.gaps.forEach(gap => {
+                let el = document.getElementById(`gap-${gap.id}`);
+                if(el){
+                    el.onclick = (event) => {
+                        if(el?.innerText.trim() !== ""){
+                            this.fetcher.message(gap.id, "remove answer");
+                        }
+                        if(this.selectedSnippet){
+                            let answer: Answer = {gap: gap, snippet: this.selectedSnippet};
+                            this.fetcher.message(answer, "add answer");
+                            this.selectedSnippet = undefined;
+                        }
+                    };
+                }
+            });
+        });
 	}
 
     createGapObject(gap: Gap){

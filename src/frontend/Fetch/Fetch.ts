@@ -10,8 +10,8 @@ export default class Fetch implements Fetcher{
         this.send("log", data);
     }
 
-    message(data: string | object){
-        this.send("message", data);
+    message(data: string | object, type: string = "message"){
+        this.send(type, data);
     }
     
     

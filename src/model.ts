@@ -26,7 +26,7 @@ export interface Answer{
 
 export interface SavedExerciseAnswer{
     //customSnippets: Array<Snippet>
-    exercise: Exercise | string
+    parsonDef: Exercise | string
     answers: Array<Answer>
 }
 
@@ -38,7 +38,7 @@ export interface ExerciseAnswer{
 
 export interface Fetcher{
     log: (data: string | object) => void
-    message: (data: string | object) => void
+    message: (data: string | object, type?: string) => void
 }
 
 export interface Highlighter{

@@ -11,7 +11,6 @@
     top: 0;
     border-left: 1px solid grey;
     height: 100%;
-
 }
 
 #error{
@@ -30,21 +29,30 @@
     vertical-align: -2px;
     text-align: center;
     border: 1px solid rgb(189, 189, 189);
-}
-
-.gap.hidden{
-    background-color: initial;
+    cursor: pointer;
+    
+    &.filled{
+        background-color: initial;
+    }
 }
 
 .snippet{
     color: black;
     background-color: rgb(189, 189, 189);
     border-radius: 10px;
-    height: 15pt;
-    min-width: 10px;
+    height: 18pt;
+    min-width: 10pt;
     padding: 1px 4px;
     text-align: center;
     margin: 20px;
+    padding: 3px 12px 8px 12px;
+    cursor: pointer;
+    vertical-align: bottom;
+    
+    &-selected{
+        border: 3px solid yellow;
+        padding: 0px 9px 5px 9px;
+    }
 }
 
 @widths: range(100);

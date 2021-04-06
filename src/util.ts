@@ -108,4 +108,13 @@ interface StringOptions{
     noSpaces?: boolean
 }
 
+export enum MessageTypes{
+    log,
+    message,
+    
+}
 
+
+export interface ElementMap{
+    [key: string]: HTMLElement;
+}

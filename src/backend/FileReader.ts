@@ -9,12 +9,16 @@ import { ExtensionContext } from 'vscode';
 
 export function validateFile(text: string, extensionPath: string): string{
     const parsed: SavedExerciseAnswer = JSON.parse(text);
-    if(typeof parsed.exercise === "string"){
-        const filename = path.join(extensionPath, '.parson', `${parsed.exercise}.parsondef`);
+    if(typeof parsed.parsonDef === "string"){
+        const filename = path.join(extensionPath, '.parson', `${parsed.parsonDef}.parsondef`);
         if(fileExists(filename)){
             const fileRead = readFileSync(filename, 'utf-8');
             console.log("read:", fileRead);
-            parsed.exercise = JSON.parse(fileRead);
+            const exerciseAnswer: ExerciseAnswer = {
+                exercise: JSON.parse(fileRead),
+                answers: parsed.answers                
+            };
+            return JSON.stringify(exerciseAnswer);
         }
     }
     return JSON.stringify(parsed);

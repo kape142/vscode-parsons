@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { nonce } from '../util';
 import { validateFile } from './FileReader';
+import { SavedExerciseAnswer, Answer} from '../model';
 
 
 export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
@@ -58,16 +59,46 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 
 		// Receive message from the webview.
 		webviewPanel.webview.onDidReceiveMessage(e => {
+			console.log(e);
 			switch (e.type) {
 				case 'log':
 					console.log(e.text);
                     return;
+				case 'remove answer':
+					this.removeAnswer(e.text, document);
+					return;
+				case 'add answer':
+					this.addAnswer(e.text, document);
+					return;
 			}
 		});
-
 		updateWebview();
-        
 	}
+
+	private removeAnswer(gapId: string, document: vscode.TextDocument){
+		const parsonDef: SavedExerciseAnswer = this.getDocumentAsSavedExerciseAnswer(document);
+		parsonDef.answers = parsonDef.answers.filter(answer => answer.gap.id !== gapId);
+		this.updateParsonDefFile(document, parsonDef);
+	}
+
+	private addAnswer(answer: Answer, document: vscode.TextDocument){
+		const parsonDef: SavedExerciseAnswer = this.getDocumentAsSavedExerciseAnswer(document);
+		parsonDef.answers.push(answer);
+		this.updateParsonDefFile(document, parsonDef);
+	}
+
+	private getDocumentAsSavedExerciseAnswer(document: vscode.TextDocument): SavedExerciseAnswer{
+		return JSON.parse(document.getText()) as SavedExerciseAnswer;
+	}
+
+	private updateParsonDefFile(document: vscode.TextDocument, json: SavedExerciseAnswer){
+		const edit = new vscode.WorkspaceEdit();
+
+		edit.replace(document.uri, new vscode.Range(0,0,document.lineCount, 0), JSON.stringify(json));
+
+		return vscode.workspace.applyEdit(edit);
+	}
+
     private getHtmlForWebview(webview: vscode.Webview): string {
 		// Local path to script and css for the webview
 		const scriptUri = webview.asWebviewUri(vscode.Uri.file(

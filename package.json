@@ -31,7 +31,15 @@
 				"command": "test-extension.helloWorld",
 				"title": "Hello World"
 			}
-		]
+		],
+		"views": {
+			"explorer": [
+				{
+					"id": "parsonExplorer",
+					"name": "Parson Explorer"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",

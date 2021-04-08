@@ -1,19 +1,22 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { nonce } from '../util';
-import { validateFile } from './FileReader';
+import { validateFile, getFilesFromText } from './FileReader';
 import { SavedExerciseAnswer, Answer} from '../model';
+import { ParsonExplorer } from './ParsonExplorer';
 
 
 export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 
-    public static register(context: vscode.ExtensionContext): vscode.Disposable {
+    public static register(context: vscode.ExtensionContext): {providerRegistration: vscode.Disposable, provider: ParsonViewerProvider} {
 		const provider = new ParsonViewerProvider(context);
 		const providerRegistration = vscode.window.registerCustomEditorProvider(ParsonViewerProvider.viewType, provider);
-		return providerRegistration;
+		return {providerRegistration, provider};
 	}
 
     private static readonly viewType = 'testExtension.parsonViewer';
+	public fileList: string[] = [];
+	private postMessage: (message?: {type: string, text: string}) => void = ()=>{};
 
     constructor(
 		private readonly context: vscode.ExtensionContext
@@ -28,10 +31,14 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 		webviewPanel.webview.options = {
 			enableScripts: true,
 		};
+
+		this.postMessage = a=> webviewPanel.webview.postMessage(a);
         
 		webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview);
 		function updateWebview() {
 			const text = validateFile(document.getText(), path.join(document.fileName, '..', '..'));
+			
+			vscode.window.registerTreeDataProvider('parsonExplorer', new ParsonExplorer(getFilesFromText(text)));
 			webviewPanel.webview.postMessage({
 				type: 'update',
 				text,
@@ -73,6 +80,10 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 			}
 		});
 		updateWebview();
+	}
+
+	public showFile(fileName: string){
+		this.postMessage({type: "show file", text: fileName});
 	}
 
 	private removeAnswer(gapId: string, document: vscode.TextDocument){

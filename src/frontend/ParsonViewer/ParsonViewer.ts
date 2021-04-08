@@ -14,6 +14,8 @@ export default class ParsonViewer{
     snippets: HTMLElement = document.getElementById("snippets")!!;
     errorContainer: HTMLElement = document.getElementById("error")!!;
 
+    shownFile?: string;
+
     selectedSnippet?: Snippet;
 
     snippetMap: ElementMap = {};
@@ -26,7 +28,18 @@ export default class ParsonViewer{
 				const text = message.text;
 				this.updateContent(text);
 				return;
+            case 'show file':
+                const filename = message.text;
+                this.showFile(filename);
+                return;
 		}
+    }
+    
+    showFile(filename: string){
+        this.fetcher.log("show: "+filename);
+        document.getElementById(`exercise-file-${this.shownFile}`)?.classList.remove("file-show");
+        document.getElementById(`exercise-file-${filename}`)?.classList.add("file-show");
+        this.shownFile = filename;
     }
 
     updateContent(text: string) {
@@ -46,9 +59,13 @@ export default class ParsonViewer{
 		// Render the code
 		this.code.innerHTML = '';
 		for (const file of exercise.files) {
+            if(!this.shownFile){
+                this.showFile(file.name);
+            }
             const highlightedCode = this.highlighter.addHighlighting("java", file.text);
             const element = document.createElement('div');
             element.className = 'file';
+            element.id = `exercise-file-${file.name}`;
 			this.code.appendChild(element);
             let innerHTML = highlightedCode;
             file.gaps.forEach(gap => {
@@ -106,6 +123,7 @@ export default class ParsonViewer{
                 }
             });
         });
+        document.getElementById(`exercise-file-${this.shownFile}`)?.classList.add("file-show");
 	}
 
     createGapObject(gap: Gap){

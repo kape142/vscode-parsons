@@ -16,12 +16,17 @@ export function validateFile(text: string, extensionPath: string): string{
             console.log("read:", fileRead);
             const exerciseAnswer: ExerciseAnswer = {
                 exercise: JSON.parse(fileRead),
-                answers: parsed.answers                
+                answers: parsed.answers       
             };
             return JSON.stringify(exerciseAnswer);
         }
     }
     return JSON.stringify(parsed);
+}
+
+export function getFilesFromText(text: string): string[]{
+    const parsed: ExerciseAnswer = JSON.parse(text);
+    return parsed.exercise.files.map(file => file.name);
 }
 
 

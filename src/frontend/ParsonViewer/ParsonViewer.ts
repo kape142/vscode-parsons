@@ -68,11 +68,12 @@ export default class ParsonViewer{
             element.id = `exercise-file-${file.name}`;
 			this.code.appendChild(element);
             let innerHTML = highlightedCode;
+            this.fetcher.log(highlightedCode);
             file.gaps.forEach(gap => {
-                this.fetcher.log(gap.id);
-                innerHTML = innerHTML.replace(`$parson{${gap.id}}`, this.createGapObject(gap));
+                //this.fetcher.log(gap.id);
+                innerHTML = innerHTML.replace(new RegExp(`(<.*>)?\\$(<.*>)?parson(<.*>)?{(<.*>)?${gap.id}(<.*>)?}`), this.createGapObject(gap));
             });
-            this.fetcher.log(innerHTML);
+            //this.fetcher.log(innerHTML);
             element.innerHTML = innerHTML;
 		}
 
@@ -96,7 +97,7 @@ export default class ParsonViewer{
             this.snippetMap[snip.text] = el;
         }
         
-        this.fetcher.log(exerciseAnswer);
+        //this.fetcher.log(exerciseAnswer);
         for(const answer of exerciseAnswer.answers){
             let el = document.getElementById(`gap-${answer.gap.id}`);
             if(el){
@@ -128,7 +129,7 @@ export default class ParsonViewer{
 
     createGapObject(gap: Gap){
         let a =  `<span id="gap-${gap.id}" class="gap width-${gap.width}"> </span>`;
-        this.fetcher.log(a);
+        //this.fetcher.log(a);
         return a;
     }
 

@@ -7,10 +7,11 @@ import { ParsonExplorer } from './ParsonExplorer';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	console.log("start");
 	let result = ParsonViewerProvider.register(context);
 	context.subscriptions.push(result.providerRegistration);
-	
-	vscode.commands.registerCommand('parsonExplorer.displayFile', (filename) => result.provider.showFile(filename));
+	vscode.commands.registerCommand('parsonExplorer.displayFile', (filename, uri) => result.provider.showFile(filename, uri));
+	vscode.window.registerTreeDataProvider('parsonExplorer', new ParsonExplorer(vscode.workspace.workspaceFolders!![0].uri.fsPath));
 }
 
 // this method is called when your extension is deactivated

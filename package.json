@@ -11,6 +11,7 @@
 	],
 	"activationEvents": [
 		"onCustomEditor:testExtension.parsonViewer",
+        "onView:parsonExplorer",
 		"onCommand:test-extension.helloWorld"
 	],
 	"main": "./dist/extension.js",

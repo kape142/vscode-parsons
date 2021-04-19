@@ -1,0 +1,55 @@
+{
+    "name": "Oppgave 3: Arv",
+    "files": [
+        {
+            "name": "Ansatt.java",
+            "text": "public abstract class Ansatt {\n\n    public abstract double getLønn();\n\n    $parson{grunnbelop} final double grunnbeløp = 100000;\n\n}",
+            "gaps": [
+                {
+                    "id": "grunnbelop",
+                    "width": 16
+                }
+            ]
+        },
+        {
+            "name": "Selger.java",
+            "text": "public class Selger $parson{arver}{\n\n    $parson{getlønn} getLønn(){\n        return grunnbeløp * 4.5;\n    }\n    \n}",
+            "gaps": [
+                {
+                    "id": "arver",
+                    "width": 24
+                },
+                {
+                    "id": "getlønn",
+                    "width": 35
+                }
+            ]
+        }
+    ],
+    "snippets": [
+        {
+            "text": "extends Ansatt"
+        },
+        {
+            "text": "implements Ansatt"
+        },
+        {
+            "text": ": Ansatt"
+        },
+        {
+            "text": "public"
+        },
+        {
+            "text": "private"
+        },
+        {
+            "text": "protected"
+        },
+        {
+            "text": "public double"
+        },
+        {
+            "text": "public override double"
+        }
+    ]
+}

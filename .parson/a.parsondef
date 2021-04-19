@@ -1,5 +1,5 @@
 {
-    "name": "Intro",
+    "name": "Oppgave 1: Hello World",
     "files": [
         {
             "name": "HelloWorld.java",
@@ -22,12 +22,6 @@
         },
         {
             "text": "World"
-        },
-        {
-            "text": "Guys"
-        },
-        {
-            "text": "int code"
         }
     ]
 }

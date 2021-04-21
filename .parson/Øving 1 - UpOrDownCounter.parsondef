@@ -1,0 +1,49 @@
+{
+    "name": "Øving 1 - UpOrDownCounter",
+    "files": [
+        {
+            "name": "UpOrDownCounter.java",
+            "text": "public class UpOrDownCounter {\n\n    private int start, end, delta;\n    private int counter;\n\n    public UpOrDownCounter(int start, int end) {\n        this.start = start;\n        this.end = end;\n        delta = signum(start, end);\n        if (start == end) {\n            throw new IllegalArgumentException(\"Start and end cannot be equal\");\n        }\n        counter = start;\n    }\n\n    private int signum(int n1, int n2) {\n        if (n1 < n2) {\n            $parson{signum1}\n        } else if (n2 < n1) {\n            $parson{signum2}\n        } else {\n            return 0;\n        }\n    }\n    \n    public boolean count() {\n        if ($parson{count1} == $parson{count2}) {\n            counter += delta;\n            return true;\n        }else{\n            return false;\n        }\n    }\n    \n    public int getCounter() {\n        return counter;\n    }\n}",
+            "gaps": [
+                {
+                    "id": "signum1",
+                    "width": 20
+                },
+                {
+                    "id": "signum2",
+                    "width": 20
+                },
+                {
+                    "id": "count1",
+                    "width": 30
+                },
+                {
+                    "id": "count2",
+                    "width": 30
+                }
+            ]
+        }
+    ],
+    "snippets": [
+        {
+            "text": "return 1;",
+            "id": 1
+        },
+        {
+            "text": "return -1;",
+            "id": 2
+        },
+        {
+            "text": "signum(start, counter)",
+            "id": 3
+        },
+        {
+            "text": "signum(counter, end)",
+            "id": 4
+        },
+        {
+            "text": "signum(start, end)",
+            "id": 5
+        }
+    ]
+}

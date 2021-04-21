@@ -1,0 +1,95 @@
+{
+    "name": "Øving 4 - Twitter",
+    "files": [
+        {
+            "name": "TwitterAccount.java",
+            "text": "import java.util.ArrayList;\nimport java.util.Collection;\nimport java.util.Iterator;\nimport java.util.List;\n\npublic class TwitterAccount {\n    \n    private final String userName;\n    \n    private Collection<TwitterAccount> follows = new ArrayList<TwitterAccount>();\n    private Collection<TwitterAccount> followers = new ArrayList<TwitterAccount>();\n\n    private List<Tweet> tweets = new ArrayList<Tweet>();\n    \n    public TwitterAccount(String username) {\n        this.userName = username;\n    }\n        \n    public String toString() {\n        return \"[Username: \" + getUserName() + \" - \" + getTweetCount() + \" tweets]\";\n    }\n\n    public String getUserName() {\n        return userName;\n    }\n    \n    public void follow(TwitterAccount otherUser) {\n        if (this == otherUser) {\n            throw new IllegalStateException(\"You cannot follow yourself.\");\n        }\n        if ($parson{follow}) {\n            follows.add(otherUser);\n            otherUser.followers.add(this);\n        }\n    }\n    \n    public void unfollow(TwitterAccount otherUser) {\n        if ($parson{unfollow}) {\n            follows.remove(otherUser);\n            otherUser.followers.remove(this);\n        }\n    }\n\n    public boolean isFollowing(TwitterAccount otherUser) {\n        return $parson{isFollowing}\n    }\n    \n    public boolean isFollowedBy(TwitterAccount otherUser) {\n        return $parson{isFollowedBy}\n    }\n    \n    public void tweet(String text) {\n        tweets.add(new Tweet(this, text));\n    }\n    \n    public void retweet(Tweet tweet) {\n        tweets.add(new Tweet(this, tweet));\n    }\n    \n    public Tweet getTweet(int i) {\n        return tweets.get(tweets.size() - i);\n    }\n    \n    public int getTweetCount() {\n        return tweets.size();\n    }\n\n    public int getRetweetCount() {\n        int count = 0;\n        for (Tweet tweet : tweets) {\n            count += tweet.getRetweetCount();\n        }\n        return count;\n    }\n}",
+            "gaps": [
+                {
+                    "id": "isFollowing",
+                    "width": 42
+                },
+                {
+                    "id": "isFollowedBy",
+                    "width": 42
+                },
+                {
+                    "id": "follow",
+                    "width": 40
+                },
+                {
+                    "id": "unfollow",
+                    "width": 40
+                }
+            ]
+        },
+        {
+            "name": "Tweet.java",
+            "text": "public class Tweet {\n\n    private TwitterAccount owner;\n    private String text;\n    private Tweet originalTweet = null;\n    private int retweetCount = 0;\n    \n    public Tweet(TwitterAccount owner, String text) {\n        this.owner = owner;\n        this.text = text;\n    }\n    \n    public Tweet(TwitterAccount owner, Tweet originalTweet) {\n        Tweet originalOriginalTweet = originalTweet.getOriginalTweet();\n        if (originalTweet.getOwner() == owner || (originalOriginalTweet != null && originalOriginalTweet.getOwner() == owner)) {\n            throw new IllegalArgumentException(\"A tweet cannot be a retweet from the same author\");\n        }\n        this.owner = $parson{owner};\n        this.originalTweet = ($parson{originalTweet1} != null ? $parson{originalTweet2} : $parson{originalTweet3});\n        this.originalTweet.retweetCount++;\n        this.text = this.originalTweet.getText();\n    }\n    \n    @Override\n    public String toString() {\n        return \"[\" + owner.getUserName() + \": \" + getText() + (originalTweet == null ? \"\" : \" - retweet of \" + originalTweet.getOwner().getUserName()) + \"]\";\n    }    \n    \n    public String getText() {\n        return text;\n    }\n    \n    public TwitterAccount getOwner() {\n        return owner;\n    }\n    \n    public Tweet getOriginalTweet() {\n        return originalTweet;\n    }\n    \n    public int getRetweetCount() {\n        return retweetCount;\n    }\n}",
+            "gaps": [
+                {
+                    "id": "originalTweet1",
+                    "width": 30
+                },
+                {
+                    "id": "originalTweet2",
+                    "width": 30
+                },
+                {
+                    "id": "originalTweet3",
+                    "width": 30
+                },
+                {
+                    "id": "owner",
+                    "width": 45
+                }
+            ]
+        }
+    ],
+    "snippets": [
+        {
+            "text": "follows.contains(otherUser);",
+            "id": 1
+        },
+        {
+            "text": "followers.contains(otherUser);",
+            "id": 2
+        },
+        {
+            "text": "follows.contains(otherUser)",
+            "id": 3
+        },
+        {
+            "text": "!follows.contains(otherUser)",
+            "id": 4
+        },
+        {
+            "text": "originalOriginalTweet",
+            "id": 5
+        },
+        {
+            "text": "originalOriginalTweet",
+            "id": 6
+        },
+        {
+            "text": "originalTweet",
+            "id": 7
+        },
+        {
+            "text": "originalTweet",
+            "id": 8
+        },
+        {
+            "text": "owner",
+            "id": 9
+        },
+        {
+            "text": "originalTweet.getOwner()",
+            "id": 10
+        },
+        {
+            "text": "originalOriginalTweet.getOwner()",
+            "id": 11
+        }
+    ]
+}

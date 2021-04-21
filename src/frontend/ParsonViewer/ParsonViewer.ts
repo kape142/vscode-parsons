@@ -49,12 +49,12 @@ export default class ParsonViewer{
 		} catch(error: any) {
 			this.code.style.display = 'none';
 			this.errorContainer.innerText = 'Error: '+error.message;
-			//this.errorContainer.style.display = '';
+			this.errorContainer.style.display = '';
 			return;
 		}
         const exercise = exerciseAnswer.exercise;
-		//this.code.style.display = '';
-		//this.errorContainer.style.display = 'none';
+		this.code.style.display = '';
+		this.errorContainer.style.display = 'none';
 
 		// Render the code
 		this.code.innerHTML = '';
@@ -84,7 +84,7 @@ export default class ParsonViewer{
             el.textContent = snip.text;
             el.onclick = (event)=>{
                 if(this.selectedSnippet){
-                    this.snippetMap[this.selectedSnippet.text].classList.remove("snippet-selected");
+                    this.snippetMap[this.selectedSnippet.id].classList.remove("snippet-selected");
                     if(this.selectedSnippet.text === snip.text){
                         this.selectedSnippet = undefined;
                         return;
@@ -94,14 +94,14 @@ export default class ParsonViewer{
                 el.classList.add("snippet-selected");
             };
             this.snippets.appendChild(el);
-            this.snippetMap[snip.text] = el;
+            this.snippetMap[snip.id] = el;
         }
         
         //this.fetcher.log(exerciseAnswer);
         for(const answer of exerciseAnswer.answers){
             let el = document.getElementById(`gap-${answer.gap.id}`);
             if(el){
-                this.snippetMap[answer.snippet.text].style.display = "none";
+                this.snippetMap[answer.snippet.id].style.display = "none";
                 el.classList.add("filled");
                 el.innerText = answer.snippet.text;
             }

@@ -1,5 +1,5 @@
 {
-    "name": "Oppgave 1: Hello World",
+    "name": "Intro",
     "files": [
         {
             "name": "HelloWorld.java",
@@ -18,10 +18,12 @@
     ],
     "snippets": [
         {
-            "text": "String[] args"
+            "text": "String[] args",
+            "id": 1
         },
         {
-            "text": "World"
+            "text": "World",
+            "id": 2
         }
     ]
 }

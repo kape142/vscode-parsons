@@ -11,7 +11,8 @@ export interface ExerciseFile{
 }
 
 export interface Snippet{
-    text: string
+    text: string,
+    id: number
 }
 
 export interface Gap{

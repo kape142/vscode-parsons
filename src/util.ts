@@ -116,5 +116,5 @@ export enum MessageTypes{
 
 
 export interface ElementMap{
-    [key: string]: HTMLElement;
+    [key: number]: HTMLElement;
 }

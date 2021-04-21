@@ -144,7 +144,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 			</head>
 			<body>
 				<div id="code" class="hljs"></div>
-                <div id="snippets">a</div>
+                <div id="snippets"></div>
 				<div id="error"></div>
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>

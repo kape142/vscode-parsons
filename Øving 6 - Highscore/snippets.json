@@ -1,0 +1,17 @@
+{
+    "dragdrop":
+    [
+        "HighscoreList list",
+        "int pos"
+    ],
+    "dropdowns":
+        {
+            "accessor":
+            [
+                "private",
+                "public",
+                "protected",
+                ""
+            ]
+        }
+}

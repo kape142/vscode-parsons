@@ -1,0 +1,27 @@
+{
+    "HighscoreList.java": 
+        [
+            {
+                "id": "listChanged1",
+                "width": 30,
+                "type": "dragdrop"
+            },
+            {
+                "id": "listChanged2",
+                "width": 30,
+                "type": "dragdrop"
+            },
+            {
+                "id": "highscoreListProperty",
+                "width": 40,
+                "type": "dropdown",
+                "dropdown": "accessor"
+            },
+            {
+                "id": "listChanged",
+                "width": 25,
+                "type": "dropdown",
+                "dropdown": "accessor"
+            }
+        ]
+}

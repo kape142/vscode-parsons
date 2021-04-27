@@ -110,7 +110,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 	private updateParsonDefFile(document: vscode.TextDocument, json: SavedExerciseAnswer){
 		const edit = new vscode.WorkspaceEdit();
 
-		edit.replace(document.uri, new vscode.Range(0,0,document.lineCount, 0), JSON.stringify(json));
+		edit.replace(document.uri, new vscode.Range(0,0,document.lineCount, 0), JSON.stringify(json, null, 4));
 
 		return vscode.workspace.applyEdit(edit);
 	}

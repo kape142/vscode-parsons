@@ -12,7 +12,9 @@
 	"activationEvents": [
 		"onCustomEditor:testExtension.parsonViewer",
         "onView:parsonExplorer",
-		"onCommand:test-extension.helloWorld"
+		"onCommand:vscodeparsons.fileToProblem",
+		"onCommand:vscodeparsons.folderToProblem",
+		"onCommand:vscodeparsons.exportFile"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
@@ -29,8 +31,16 @@
 		],
 		"commands": [
 			{
-				"command": "test-extension.helloWorld",
-				"title": "Hello World"
+				"command": "vscodeparsons.fileToProblem",
+				"title": "Create Parsons Problem from file"
+			},
+			{
+				"command": "vscodeparsons.folderToProblem",
+				"title": "Create Parsons Problem from folder"
+			},
+			{
+				"command": "vscodeparsons.exportFile",
+				"title": "Export Parsons Problem to file"
 			}
 		],
 		"views": {

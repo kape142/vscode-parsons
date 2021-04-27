@@ -1,9 +1,9 @@
 {
     "dragdrop":
-    [
-        "HighscoreList list",
-        "int pos"
-    ],
+        [
+            "HighscoreList list",
+            "int pos"
+        ],
     "dropdowns":
         {
             "accessor":

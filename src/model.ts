@@ -18,6 +18,7 @@ export interface Snippet{
 export interface Gap{
     id: string
     width: number
+    type: "dragdrop" | "dropdown" | "write"
 }
 
 export interface Answer{
@@ -35,6 +36,27 @@ export interface ExerciseAnswer{
     //customSnippets: Array<Snippet>
     exercise: Exercise
     answers: Array<Answer>
+}
+
+export interface SnippetDirectory{
+    dragdrop: Array<string>
+    dropdown: {
+        [key:string]: Array<string>
+    }
+}
+
+export interface ParsonConfig{
+    output: {
+        parson: string
+        parsondef: string
+    }
+    name: string
+    filename?: string
+    includesSolution?: boolean
+}
+
+export interface GapDirectory{
+    [key:string]: Array<Gap>
 }
 
 export interface Fetcher{

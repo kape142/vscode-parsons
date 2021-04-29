@@ -62,6 +62,11 @@ export default class ParsonViewer{
             if(!this.shownFile){
                 this.showFile(file.name);
             }
+            file.gaps.forEach(gap => {
+                //this.fetcher.log(gap.id);
+                file.text = file.text.replace(new RegExp(`(<.*>)?\\$(<.*>)?parson(<.*>)?{(<.*>)?${gap.id}(<.*>)?}`), `/*${gap.id}*/`);
+            });
+            this.fetcher.log(file.text);
             const highlightedCode = this.highlighter.addHighlighting("java", file.text);
             const element = document.createElement('div');
             element.className = 'file';
@@ -71,9 +76,9 @@ export default class ParsonViewer{
             this.fetcher.log(highlightedCode);
             file.gaps.forEach(gap => {
                 //this.fetcher.log(gap.id);
-                innerHTML = innerHTML.replace(new RegExp(`(<.*>)?\\$(<.*>)?parson(<.*>)?{(<.*>)?${gap.id}(<.*>)?}`), this.createGapObject(gap));
+                innerHTML = innerHTML.replace(new RegExp(`(<.*>)?\\/\\*(<.*>)?${gap.id}(<.*>)?\\*\\/`), this.createGapObject(gap));
             });
-            //this.fetcher.log(innerHTML);
+            this.fetcher.log(innerHTML);
             element.innerHTML = innerHTML;
 		}
 

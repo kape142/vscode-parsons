@@ -1,0 +1,26 @@
+{
+    "Card.java": [
+        {
+            "id": "CardToString",
+            "width": 70,
+            "type": "dragdrop"
+        }
+    ],
+    "CardDeck.java": [
+        {
+            "id": "cardCount",
+            "width": 25,
+            "type": "dragdrop"
+        },
+        {
+            "id": "getCard",
+            "width": 25,
+            "type": "dragdrop"
+        },
+        {
+            "id": "CardDeckToString",
+            "width": 70,
+            "type": "dragdrop"
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+{
+    "dragdrop": [
+        "@Override",
+        "@Implement",
+        "String ticker",
+        "double oldPrice",
+        "double newPrice",
+        "Stock stock",
+        "oldPrice",
+        "this.price",
+        "this",
+        "s.addStockListener(this)",
+        "this.stocks.add(s)",
+        "this.index += s.getPrice()",
+        "implements StockListener",
+        "firePriceChanged(oldPrice)",
+        "listeners.add(listener)"
+    ]
+}

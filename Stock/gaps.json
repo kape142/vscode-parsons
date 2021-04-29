@@ -1,0 +1,67 @@
+{
+    "Stock.java": [
+        {
+            "id": "fireThis",
+            "width": 17,
+            "type": "dragdrop"
+        },
+        {
+            "id": "fireOldPrice",
+            "width": 17,
+            "type": "dragdrop"
+        },
+        {
+            "id": "fireThisPrice",
+            "width": 17,
+            "type": "dragdrop"
+        },
+        {
+            "id": "firePriceChanged",
+            "width": 37,
+            "type": "dragdrop"
+        },
+        {
+            "id": "listenersAdd",
+            "width": 37,
+            "type": "dragdrop"
+        }
+    ],
+    "StockIndex.java": [
+        {
+            "id": "override",
+            "width": 20,
+            "type": "dragdrop"
+        },
+        {
+            "id": "changeStock",
+            "width": 22,
+            "type": "dragdrop"
+        },
+        {
+            "id": "changeOldPrice",
+            "width": 22,
+            "type": "dragdrop"
+        },
+        {
+            "id": "changeNewPrice",
+            "width": 22,
+            "type": "dragdrop"
+        },
+        {
+            "id": "addListener",
+            "width": 38,
+            "type": "dragdrop"
+        },
+        {
+            "id": "addPrice",
+            "width": 38,
+            "type": "dragdrop"
+        },
+        {
+            "id": "implementsStockListener",
+            "width": 40,
+            "type": "dragdrop"
+        }
+    ],
+    "StockListener.java": []
+}

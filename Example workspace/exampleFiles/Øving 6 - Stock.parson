@@ -1,0 +1,16 @@
+{
+    "parsonDef": "Øving 6 - Stock",
+    "answers": [
+        {
+            "gap": {
+                "id": "override",
+                "width": 20,
+                "type": "dragdrop"
+            },
+            "snippet": {
+                "text": "@Override",
+                "id": 0
+            }
+        }
+    ]
+}

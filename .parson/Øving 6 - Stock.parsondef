@@ -133,12 +133,16 @@
             "id": 12
         },
         {
-            "text": "firePriceChanged(oldPrice)",
+            "text": "extends StockListener",
             "id": 13
         },
         {
-            "text": "listeners.add(listener)",
+            "text": "firePriceChanged(oldPrice)",
             "id": 14
+        },
+        {
+            "text": "listeners.add(listener)",
+            "id": 15
         }
     ]
 }

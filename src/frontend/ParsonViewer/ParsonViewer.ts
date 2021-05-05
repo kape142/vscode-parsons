@@ -76,7 +76,7 @@ export default class ParsonViewer{
             this.fetcher.log(highlightedCode);
             file.gaps.forEach(gap => {
                 //this.fetcher.log(gap.id);
-                innerHTML = innerHTML.replace(new RegExp(`(<.*>)?\\/\\*(<.*>)?${gap.id}(<.*>)?\\*\\/`), this.createGapObject(gap));
+                innerHTML = innerHTML.replace(new RegExp(`(<span class="hljs-comment">)?\\/\\*(<span class="hljs-title">)?${gap.id}(</span>)?\\*\\/(</span>)?`), this.createGapObject(gap));
             });
             this.fetcher.log(innerHTML);
             element.innerHTML = innerHTML;

@@ -3,10 +3,10 @@
     "files": [
         {
             "name": "HelloWorld.java",
-            "text": "public class HelloWorld {\n    public static void main($parson{main})) {\n        System.out.println(\"Hello, $parson{hello}\");\n    }\n}",
+            "text": "public class HelloWorld {\n    public static void main($parson{stringArgs})) {\n        System.out.println(\"Hello, $parson{hello}\");\n    }\n}",
             "gaps": [
                 {
-                    "id": "main",
+                    "id": "stringArgs",
                     "width": 18
                 },
                 {

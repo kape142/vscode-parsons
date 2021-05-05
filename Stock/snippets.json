@@ -13,6 +13,7 @@
         "this.stocks.add(s)",
         "this.index += s.getPrice()",
         "implements StockListener",
+        "extends StockListener",
         "firePriceChanged(oldPrice)",
         "listeners.add(listener)"
     ]

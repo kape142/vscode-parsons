@@ -81,9 +81,11 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 
 	public showFile(fileName: string, uri: string){
 		console.log("show file click", fileName, uri, this.currentFile);
+		vscode.commands.executeCommand("vscode.openWith", vscode.Uri.joinPath(vscode.workspace.workspaceFolders![0].uri, uri), ParsonViewerProvider.viewType);
+		this.currentFile = uri;
 		if(this.currentFile !== uri){
-			vscode.commands.executeCommand("vscode.openWith", vscode.Uri.joinPath(vscode.workspace.workspaceFolders![0].uri, uri), ParsonViewerProvider.viewType);
-			this.currentFile = uri;
+			
+			
 		}
 		let sendMessage = this.postMessage.get(uri);
 		if(sendMessage){

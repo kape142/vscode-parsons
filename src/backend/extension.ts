@@ -2,26 +2,18 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { ParsonViewerProvider } from './ParsonViewerProvider';
+import { ParsonExplorer } from './ParsonExplorer';
+import { AdminTools } from './AdminTools';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "test-extension" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('test-extension.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from test-extension!');
-	});
-
-	context.subscriptions.push(ParsonViewerProvider.register(context));
-
+	console.log("start");
+	AdminTools.register(context);
+	let result = ParsonViewerProvider.register(context);
+	context.subscriptions.push(result.providerRegistration);
+	vscode.commands.registerCommand('parsonExplorer.displayFile', (filename, uri) => result.provider.showFile(filename, uri));
+	vscode.window.registerTreeDataProvider('parsonExplorer', new ParsonExplorer(vscode.workspace.workspaceFolders!![0].uri.fsPath));
 }
 
 // this method is called when your extension is deactivated

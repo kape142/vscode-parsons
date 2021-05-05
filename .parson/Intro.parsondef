@@ -1,0 +1,29 @@
+{
+    "name": "Intro",
+    "files": [
+        {
+            "name": "HelloWorld.java",
+            "text": "public class HelloWorld {\n    public static void main($parson{stringArgs})) {\n        System.out.println(\"Hello, $parson{hello}\");\n    }\n}",
+            "gaps": [
+                {
+                    "id": "stringArgs",
+                    "width": 18
+                },
+                {
+                    "id": "hello",
+                    "width": 8
+                }
+            ]
+        }
+    ],
+    "snippets": [
+        {
+            "text": "String[] args",
+            "id": 1
+        },
+        {
+            "text": "World",
+            "id": 2
+        }
+    ]
+}

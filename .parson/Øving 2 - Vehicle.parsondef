@@ -1,0 +1,161 @@
+{
+    "name": "Øving 2 - Vehicle",
+    "files": [
+        {
+            "name": "Vehicle.java",
+            "text": "import java.util.Arrays;\nimport java.util.List;\n\npublic class Vehicle {\n    \n    $parson{registrationNumber} String registrationNumber;\n    $parson{fuelType} char fuelType;\n    $parson{vehicleType} char vehicleType;\n    $parson{validFuels} List<Character> validFuels = Arrays.asList('D', 'G', 'E', 'H');\n    $parson{invalidLetters} List<Character> invalidLetters = Arrays.asList('Æ', 'Ø', 'Å');\n    \n    $parson{vehicle} Vehicle(char vehicleType, char fuelType, String registrationNumber){\n        checkValidFuelAndVehicleType(fuelType, vehicleType);\n        this.fuelType = fuelType;\n        this.vehicleType = vehicleType;\n        setRegistrationNumber(registrationNumber);\n    }\n    \n    $parson{getRegistrationNumber} String getRegistrationNumber() {\n        return registrationNumber;\n    }\n    \n    $parson{getFuelType} char getFuelType() {\n        return fuelType;\n    }\n    \n    $parson{getVehicleType} char getVehicleType() {\n        return vehicleType;\n    }\n    \n    $parson{setRegistrationNumber} void setRegistrationNumber(String regNr){\n        checkRegistrationNumber(regNr);\n        this.registrationNumber = regNr;\n    }\n    \n    $parson{checkValidVehicleType} void checkValidVehicleType(char vehicleType) {\n        if (!(vehicleType == 'C' || vehicleType == 'M')){\n            throw new IllegalArgumentException(\"vehicleType must be either C or M, but was \" + vehicleType);\n        }\n    }\n\n    $parson{checkValidFuelType} void checkValidFuelType(char fuelType) {\n        if (!validFuels.contains(fuelType)){\n            throw new IllegalArgumentException(\"Valid fuels are 'D', 'G', 'E' and 'H', not :\" + fuelType);\n        }\n    }\n    \n    $parson{checkValidFuelAndVehicleType} void checkValidFuelAndVehicleType(char fuel, char vehicleType){\n        checkValidFuelType(fuel);\n        checkValidVehicleType(vehicleType);\n        if(fuel == 'H' && vehicleType == 'M'){\n            throw new IllegalArgumentException(\"fuel can not be hydrogen (H) when vehicle type is motorcycle (C)\");\n        }\n    }\n\n    $parson{checkRegistrationNumber} void checkRegistrationNumber(String regNr) {\n        String regLetters = regNr.substring(0, 2);\n        String regDigits = regNr.substring(2);\n        checkValidLetters(regLetters);\n        checkValidDigits(regDigits);\n    }\n\n    $parson{checkValidDigits} void checkValidDigits(String regDigits) {\n        if(vehicleType == 'C' && regDigits.length()!=5){\n            throw new IllegalArgumentException(\"Cars should have a registration number with 5 digits\");\n        }\n        if(vehicleType == 'M' && regDigits.length()!=4){\n            throw new IllegalArgumentException(\"Motorcycles should have a registration number with 4 digits\");\n        }\n        if (!isAllDigits(regDigits)){\n            throw new IllegalArgumentException(regDigits + \" should be digits\");\n        }\n    }\n\n    $parson{isAllDigits} boolean isAllDigits(String regDigits) {\n        for (int i = 0; i < regDigits.length(); i++){\n            if (!Character.isDigit(regDigits.charAt(i))){\n                return false;\n            }\n        }\n        return true;\n    }\n\n    $parson{checkValidLetters} void checkValidLetters(String regLetters) {\n        if(!(Character.isUpperCase(regLetters.charAt(0)) && Character.isUpperCase(regLetters.charAt(1)))){\n            throw new IllegalArgumentException(\"Registration numbers should start with two uppercase letters but was: \" + regLetters);\n        }\n        if(fuelType == 'E' && !(regLetters.equals(\"EL\") || regLetters.equals(\"EK\"))){\n            throw new IllegalArgumentException(\"For electrical vehicles the letters should be EL or EK but was :\" + regLetters);\n        }\n        if(fuelType == 'H' && !(regLetters.equals(\"HY\"))){\n            throw new IllegalArgumentException(\"For hydrogen vehicles the letters should be HY :\" + regLetters);\n        }\n        if((fuelType == 'D' ||fuelType == 'G') && (regLetters.equals(\"EL\")||regLetters.equals(\"EK\")||regLetters.equals(\"HY\"))){\n            throw new IllegalArgumentException(\"For diesel and petrol vehicles the letters should not be EL, EK or HY, but was: \" + regLetters);\n        }\n        if(invalidLetters.contains(regLetters.charAt(0))||invalidLetters.contains(regLetters.charAt(1))){\n            throw new IllegalArgumentException(\"Letters should not be Æ, Ø or Å, but was \" + regLetters);\n        }\n    }\n}",
+            "gaps": [
+                {
+                    "id": "registrationNumber",
+                    "width": 15
+                },
+                {
+                    "id": "fuelType",
+                    "width": 15
+                },
+                {
+                    "id": "vehicleType",
+                    "width": 15
+                },
+                {
+                    "id": "validFuels",
+                    "width": 15
+                },
+                {
+                    "id": "invalidLetters",
+                    "width": 15
+                },
+                {
+                    "id": "vehicle",
+                    "width": 15
+                },
+                {
+                    "id": "getRegistrationNumber",
+                    "width": 15
+                },
+                {
+                    "id": "getFuelType",
+                    "width": 15
+                },
+                {
+                    "id": "getVehicleType",
+                    "width": 15
+                },
+                {
+                    "id": "setRegistrationNumber",
+                    "width": 15
+                },
+                {
+                    "id": "checkValidVehicleType",
+                    "width": 15
+                },
+                {
+                    "id": "checkValidFuelType",
+                    "width": 15
+                },
+                {
+                    "id": "checkValidFuelAndVehicleType",
+                    "width": 15
+                },
+                {
+                    "id": "checkRegistrationNumber",
+                    "width": 15
+                },
+                {
+                    "id": "checkValidDigits",
+                    "width": 15
+                },
+                {
+                    "id": "isAllDigits",
+                    "width": 15
+                },
+                {
+                    "id": "checkValidLetters",
+                    "width": 15
+                }
+            ]
+        }
+    ],
+    "snippets": [
+        {
+            "text": "public",
+            "id": 1
+        },
+        {
+            "text": "public",
+            "id": 2
+        },
+        {
+            "text": "public",
+            "id": 3
+        },
+        {
+            "text": "public",
+            "id": 4
+        },
+        {
+            "text": "public",
+            "id": 5
+        },
+        {
+            "text": "public",
+            "id": 6
+        },
+        {
+            "text": "public",
+            "id": 7
+        },
+        {
+            "text": "private",
+            "id": 8
+        },
+        {
+            "text": "private",
+            "id": 9
+        },
+        {
+            "text": "private",
+            "id": 10
+        },
+        {
+            "text": "private",
+            "id": 11
+        },
+        {
+            "text": "private",
+            "id": 12
+        },
+        {
+            "text": "private",
+            "id": 13
+        },
+        {
+            "text": "private",
+            "id": 14
+        },
+        {
+            "text": "private",
+            "id": 15
+        },
+        {
+            "text": "private",
+            "id": 16
+        },
+        {
+            "text": "private",
+            "id": 17
+        },
+        {
+            "text": "private",
+            "id": 18
+        },
+        {
+            "text": "private",
+            "id": 19
+        },
+        {
+            "text": "private",
+            "id": 20
+        }
+    ]
+}

@@ -1,0 +1,41 @@
+{
+    "name": "Øving 1 - Account",
+    "files": [
+        {
+            "name": "Account.java",
+            "text": "public class Account {\n\n    double balance;\n    double interestRate;\n    \n    public String toString() {\n        return String.format(\"[Account balance=%f interestRate=%f\", balance, interestRate);\n    }\n    \n    double getBalance() {\n        return balance;\n    }\n    \n    double getInterestRate() {\n        return interestRate;\n    }\n    \n    void setInterestRate($parson{setInterestRate}) {\n        this.interestRate = interestRate;\n    }\n    \n    void deposit(double amount) {\n        if ($parson{amount}) {\n            balance = balance + amount;\n        }\n    }\n    \n    void addInterest() {\n        deposit(balance * interestRate / 100);\n    }\n}",
+            "gaps": [
+                {
+                    "id": "setInterestRate",
+                    "width": 28
+                },
+                {
+                    "id": "amount",
+                    "width": 20
+                }
+            ]
+        }
+    ],
+    "snippets": [
+        {
+            "text": "double interestRate",
+            "id": 1
+        },
+        {
+            "text": "int interestRate",
+            "id": 2
+        },
+        {
+            "text": "amount < 0",
+            "id": 3
+        },
+        {
+            "text": "amount > 0",
+            "id": 4
+        },
+        {
+            "text": "amount != 0",
+            "id": 5
+        }
+    ]
+}

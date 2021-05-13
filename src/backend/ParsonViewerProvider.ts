@@ -93,16 +93,25 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 		}
 	}
 
-	private removeAnswer(gapId: string, document: vscode.TextDocument){
-		const parsonDef: SavedExerciseAnswer = this.getDocumentAsSavedExerciseAnswer(document);
-		parsonDef.answers = parsonDef.answers.filter(answer => answer.gap.id !== gapId);
-		this.updateParsonDefFile(document, parsonDef);
+	private removeAnswer(snippetId: string, document: vscode.TextDocument){
+		const parson: SavedExerciseAnswer = this.getDocumentAsSavedExerciseAnswer(document);
+		parson.answers = parson.answers.filter(answer => answer.snippet.id !== Number(snippetId));
+		console.log(parson.answers, snippetId);
+		this.updateParsonDefFile(document, parson);
 	}
 
 	private addAnswer(answer: Answer, document: vscode.TextDocument){
-		const parsonDef: SavedExerciseAnswer = this.getDocumentAsSavedExerciseAnswer(document);
-		parsonDef.answers.push(answer);
-		this.updateParsonDefFile(document, parsonDef);
+		const parson: SavedExerciseAnswer = this.getDocumentAsSavedExerciseAnswer(document);
+		console.log(parson.answers);
+		const otherSnippet = parson.answers.find(an => an.gap.id === answer.gap.id)?.snippet;
+		const otherGap = parson.answers.find(an => an.snippet.id === answer.snippet.id)?.gap;
+		parson.answers = parson.answers.filter(a => a.gap.id !== answer.gap.id && a.snippet.id !== answer.snippet.id);
+		if(otherSnippet && otherGap){
+			parson.answers.push({snippet: otherSnippet, gap: otherGap});
+		}
+		parson.answers.push(answer);
+		console.log(parson.answers, answer, otherSnippet, otherGap);
+		this.updateParsonDefFile(document, parson);
 	}
 
 	private getDocumentAsSavedExerciseAnswer(document: vscode.TextDocument): SavedExerciseAnswer{

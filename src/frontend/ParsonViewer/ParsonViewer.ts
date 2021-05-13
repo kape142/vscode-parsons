@@ -16,13 +16,13 @@ export default class ParsonViewer{
 
     shownFile?: string;
 
-    selectedSnippet?: Snippet;
+    
 
-    snippetMap: ElementMap = {};
+    snippetMap: {[key: string]: Snippet} = {};
     
 
     message(message: {type: string, text: string}): void{
-        this.fetcher.log("message received: "+JSON.stringify(message));
+        //this.fetcher.log("message received: "+JSON.stringify(message));
         switch (message.type) {
 			case 'update':
 				const text = message.text;
@@ -66,28 +66,29 @@ export default class ParsonViewer{
                 //this.fetcher.log(gap.id);
                 file.text = file.text.replace(new RegExp(`(<.*>)?\\$(<.*>)?parson(<.*>)?{(<.*>)?${gap.id}(<.*>)?}`), `/*${gap.id}*/`);
             });
-            this.fetcher.log(file.text);
+            //this.fetcher.log(file.text);
             const highlightedCode = this.highlighter.addHighlighting("java", file.text);
             const element = document.createElement('div');
             element.className = 'file';
             element.id = `exercise-file-${file.name}`;
 			this.code.appendChild(element);
             let innerHTML = highlightedCode;
-            this.fetcher.log(highlightedCode);
+            //this.fetcher.log(highlightedCode);
             file.gaps.forEach(gap => {
                 //this.fetcher.log(gap.id);
                 innerHTML = innerHTML.replace(new RegExp(`(<span class="hljs-comment">)?\\/\\*(<span class="hljs-title">)?${gap.id}(</span>)?\\*\\/(</span>)?`), this.createGapObject(gap));
             });
-            this.fetcher.log(innerHTML);
+            //this.fetcher.log(innerHTML);
             element.innerHTML = innerHTML;
 		}
 
         this.snippets.innerHTML = "";
         for(const snip of exercise.snippets){
             let el = document.createElement("div");
+            el.id = `snippet-${snip.id}`;
             el.className = "snippet";
             el.textContent = snip.text;
-            el.onclick = (event)=>{
+            /*el.onclick = (event)=>{
                 if(this.selectedSnippet){
                     this.snippetMap[this.selectedSnippet.id].classList.remove("snippet-selected");
                     if(this.selectedSnippet.text === snip.text){
@@ -97,18 +98,26 @@ export default class ParsonViewer{
                 }
                 this.selectedSnippet = snip;
                 el.classList.add("snippet-selected");
+            };*/
+            el.draggable = true;
+            el.ondragstart = (ev: DragEvent) => {
+                ev.dataTransfer?.setData("text/plain", `${snip.id}`);
             };
             this.snippets.appendChild(el);
-            this.snippetMap[snip.id] = el;
+            this.snippetMap[snip.id] = snip;
         }
         
         //this.fetcher.log(exerciseAnswer);
         for(const answer of exerciseAnswer.answers){
             let el = document.getElementById(`gap-${answer.gap.id}`);
             if(el){
-                this.snippetMap[answer.snippet.id].style.display = "none";
-                el.classList.add("filled");
-                el.innerText = answer.snippet.text;
+                let snip = document.getElementById(`snippet-${answer.snippet.id}`);
+                if(snip){
+                    snip.style.display = "none";
+                    el.classList.add("filled");
+                    el.innerText = answer.snippet.text;
+                    el.dataset.snippetId = `${answer.snippet.id}`;
+                }
             }
         }
 
@@ -116,7 +125,29 @@ export default class ParsonViewer{
             file.gaps.forEach(gap => {
                 let el = document.getElementById(`gap-${gap.id}`);
                 if(el){
-                    el.onclick = (event) => {
+                    if(el?.dataset.snippetId){
+                        el.draggable = true;
+                    }
+                    el.ondragover = (ev: DragEvent) => {
+                        ev.preventDefault();
+                        if(ev.dataTransfer){
+                            ev.dataTransfer.dropEffect = "move";
+                        }
+                    };
+                    el.ondrop = (ev: DragEvent) => {
+                        ev.preventDefault();
+                        const snippetId = ev.dataTransfer?.getData("text/plain");
+                        if(snippetId){
+                            let answer: Answer = {gap: gap, snippet: this.snippetMap[snippetId]};
+                            this.fetcher.message(answer, "add answer");
+                        }
+                    };
+                    el.ondragstart = (ev: DragEvent) => {
+                        if(el?.dataset.snippetId){
+                            ev.dataTransfer?.setData("text/plain", el.dataset.snippetId);
+                        }
+                    };
+                    /*el.onclick = (event) => {
                         if(el?.innerText.trim() !== ""){
                             this.fetcher.message(gap.id, "remove answer");
                         }
@@ -125,10 +156,25 @@ export default class ParsonViewer{
                             this.fetcher.message(answer, "add answer");
                             this.selectedSnippet = undefined;
                         }
-                    };
+                    };*/
                 }
             });
         });
+
+        this.snippets.ondragover = (ev: DragEvent) => {
+            ev.preventDefault();
+            if(ev.dataTransfer){
+                ev.dataTransfer.dropEffect = "move";
+            }
+        };
+        this.snippets.ondrop = (ev: DragEvent) => {
+            ev.preventDefault();
+            const snippetId = ev.dataTransfer?.getData("text/plain");
+            if(snippetId){
+                this.fetcher.message(snippetId, "remove answer");
+            }
+        };
+
         document.getElementById(`exercise-file-${this.shownFile}`)?.classList.add("file-show");
 	}
 

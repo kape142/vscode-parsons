@@ -1,3 +1,5 @@
+import * as vscode from 'vscode';
+
 export interface Exercise{
     name: string
     snippets: Array<Snippet>
@@ -57,6 +59,11 @@ export interface ParsonConfig{
 
 export interface GapDirectory{
     [key:string]: Array<Gap>
+}
+
+export interface DisposableWrapper<T>{
+    it : T
+    disposable: vscode.Disposable
 }
 
 export interface Fetcher{

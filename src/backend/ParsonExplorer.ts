@@ -2,10 +2,16 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import {ExerciseAnswer} from '../model';
-import { getParsonFilesInFolder, readParsonFile } from './FileReader';
+import { getParsonFilesInFolder, readParsonFileToString } from './FileReader';
 
 export class ParsonExplorer implements vscode.TreeDataProvider<ExerciseFile>{
+
+    public static register(workspaceroot: string): vscode.Disposable {
+        const parsonExplorer = new ParsonExplorer(workspaceroot);
+        return vscode.window.registerTreeDataProvider('parsonExplorer', parsonExplorer);
+    }
     constructor( private workspaceroot: string){}
+
     onDidChangeTreeData?: vscode.Event<void | ExerciseFile | null | undefined> | undefined;
 
     getTreeItem(element: ExerciseFile): vscode.TreeItem | Thenable<vscode.TreeItem> {
@@ -19,8 +25,8 @@ export class ParsonExplorer implements vscode.TreeDataProvider<ExerciseFile>{
         }
         console.log("no children");
         let a =  getParsonFilesInFolder(this.workspaceroot).map(filename => {
-            const read = readParsonFile(filename, this.workspaceroot);
-            console.log(filename, read);
+            const read = readParsonFileToString(filename, this.workspaceroot);
+            //console.log(filename, read);
             const parsed = JSON.parse(read) as ExerciseAnswer;
             return new ExerciseFile(parsed.exercise.name, filename, parsed.exercise.files.map(file => file.name));
         });
@@ -45,6 +51,8 @@ export class ExerciseFile extends vscode.TreeItem {
                 title: '',
                 arguments: [label, uri]
             };
+            this.resourceUri = vscode.Uri.parse(`parson:${path.join(uri, label)}`, true);
         }
+        console.log("TreeItem constructor: ", uri, this.label, this.resourceUri);
     }    
 }

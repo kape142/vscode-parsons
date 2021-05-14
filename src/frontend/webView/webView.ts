@@ -20,7 +20,7 @@ const parsonViewer = new ParsonViewer(fetcher, highlighter);
 
 window.addEventListener('message', event => {
     const message = event.data; // The json data that the extension sent
-    fetcher.log("message event: " +JSON.stringify(message));
+    //fetcher.log("message event: " +JSON.stringify(message));
     parsonViewer.message(message);
 
     switch (message.type) {
@@ -34,6 +34,6 @@ window.addEventListener('message', event => {
 
 const state = vscode.getState();
 	if (state) {
-        fetcher.log("state: "+ JSON.stringify(state));
+        //fetcher.log("state: "+ JSON.stringify(state));
 		parsonViewer.message({type: "update", text: state.text});
 	}

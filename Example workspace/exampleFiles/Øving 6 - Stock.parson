@@ -1,4 +1,16 @@
 {
     "parsonDef": "Øving 6 - Stock",
-    "answers": []
+    "answers": [
+        {
+            "gap": {
+                "id": "firePriceChanged",
+                "width": 37,
+                "type": "dragdrop"
+            },
+            "snippet": {
+                "text": "@Override",
+                "id": 0
+            }
+        }
+    ]
 }

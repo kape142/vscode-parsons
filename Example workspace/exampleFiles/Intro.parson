@@ -1,4 +1,25 @@
 {
     "parsonDef": "Intro",
-    "answers": []
+    "answers": [
+        {
+            "gap": {
+                "id": "stringArgs",
+                "width": 18
+            },
+            "snippet": {
+                "text": "String[] args",
+                "id": 1
+            }
+        },
+        {
+            "gap": {
+                "id": "hello",
+                "width": 8
+            },
+            "snippet": {
+                "text": "World",
+                "id": 2
+            }
+        }
+    ]
 }

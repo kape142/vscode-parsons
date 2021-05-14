@@ -1,4 +1,25 @@
 {
     "parsonDef": "Øving 2 - Vehicle",
-    "answers": []
+    "answers": [
+        {
+            "gap": {
+                "id": "registrationNumber",
+                "width": 15
+            },
+            "snippet": {
+                "text": "public",
+                "id": 1
+            }
+        },
+        {
+            "gap": {
+                "id": "fuelType",
+                "width": 15
+            },
+            "snippet": {
+                "text": "public",
+                "id": 2
+            }
+        }
+    ]
 }

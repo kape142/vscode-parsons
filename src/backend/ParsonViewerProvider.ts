@@ -1,24 +1,30 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { nonce } from '../util';
-import { loadExercises, getFilesFromText } from './FileReader';
-import { SavedExerciseAnswer, Answer} from '../model';
+import { loadExercisesToString, getFilesFromText, loadExercises } from './FileReader';
+import { SavedExerciseAnswer, Answer, ExerciseAnswer, DisposableWrapper} from '../model';
+import { ParsonDecorationProvider } from './ParsonDecorationProvider';
 
 
 export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 
-    public static register(context: vscode.ExtensionContext): {providerRegistration: vscode.Disposable, provider: ParsonViewerProvider} {
-		const provider = new ParsonViewerProvider(context);
+    public static register(
+		context: vscode.ExtensionContext, 
+		decorator: ParsonDecorationProvider,
+		workspaceroot: string): DisposableWrapper<ParsonViewerProvider> {
+		const provider = new ParsonViewerProvider(context, decorator, workspaceroot);
 		const providerRegistration = vscode.window.registerCustomEditorProvider(ParsonViewerProvider.viewType, provider);
-		return {providerRegistration, provider};
+		return {it: provider, disposable: providerRegistration};
 	}
 
     private static readonly viewType = 'testExtension.parsonViewer';
-	private currentFile?: string;
 	private postMessage: Map<string, (message?: {type: string, text: string}) => void> = new Map();
+	private currentFileMap: {[key: string]: string} = {};
 
     constructor(
-		private readonly context: vscode.ExtensionContext
+		private readonly context: vscode.ExtensionContext,
+		private readonly decorator: ParsonDecorationProvider,
+		private readonly workspaceroot: string
 	) { }
 
     public async resolveCustomTextEditor(
@@ -30,13 +36,20 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 		webviewPanel.webview.options = {
 			enableScripts: true,
 		};
+
+		const workspaceroot = vscode.workspace.workspaceFolders![0].uri.fsPath;
 		
-		const identifier = document.fileName.substr(vscode.workspace.workspaceFolders![0].uri.fsPath.length+1);
+		const identifier = document.fileName.substr(workspaceroot.length+1);
 		this.postMessage.set(identifier, a=> webviewPanel.webview.postMessage(a));
-        
+
+		const parson = loadExercises(JSON.parse(document.getText()), workspaceroot);
+		this.currentFileMap[document.uri.fsPath.substring(workspaceroot.length+1)] = parson.exercise.files[0].name;
+		console.log("init curfile" , this.currentFileMap,document.uri.fsPath , document.uri.fsPath.substring(workspaceroot.length+1), parson.exercise.files[0].name);
+		
 		webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview);
+
 		function updateWebview() {
-			const text = loadExercises(document.getText(), vscode.workspace.workspaceFolders!![0].uri.fsPath);
+			const text = loadExercisesToString(document.getText(), workspaceroot);
 			webviewPanel.webview.postMessage({
 				type: 'update',
 				text,
@@ -79,18 +92,18 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 		updateWebview();
 	}
 
-	public showFile(fileName: string, uri: string){
-		console.log("show file click", fileName, uri, this.currentFile);
-		vscode.commands.executeCommand("vscode.openWith", vscode.Uri.joinPath(vscode.workspace.workspaceFolders![0].uri, uri), ParsonViewerProvider.viewType);
-		this.currentFile = uri;
-		if(this.currentFile !== uri){
-			
-			
-		}
-		let sendMessage = this.postMessage.get(uri);
-		if(sendMessage){
-			sendMessage({type: "show file", text: fileName});
-		}
+	public showFile(fileName: string, uri: string): void{
+		console.log("show file click", fileName, uri);
+		this.currentFileMap[uri] = fileName;
+		vscode.commands.executeCommand(
+			"vscode.openWith",
+			vscode.Uri.joinPath(vscode.workspace.workspaceFolders![0].uri, uri), ParsonViewerProvider.viewType
+		).then(()=>{
+			let sendMessage = this.postMessage.get(uri);
+			if(sendMessage){
+				sendMessage({type: "show file", text: fileName});
+			}
+		});
 	}
 
 	private removeAnswer(snippetId: string, document: vscode.TextDocument){
@@ -120,10 +133,15 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 
 	private updateParsonDefFile(document: vscode.TextDocument, json: SavedExerciseAnswer){
 		const edit = new vscode.WorkspaceEdit();
-
+		//console.log(document.uri);
+		//console.log(path.normalize(document.uri.fsPath), path.normalize(this.workspaceroot));
+		const fileUri = document.uri.fsPath.substring(this.workspaceroot.length+1);
+		//console.log(fileUri, this.currentFileMap);
+		const parsonUri = vscode.Uri.parse(`parson:${path.join(fileUri, this.currentFileMap[fileUri] || "")}`);
+		//console.log(parsonUri);
+		this.decorator.fileChangeEmitter.fire(parsonUri);
 		edit.replace(document.uri, new vscode.Range(0,0,document.lineCount, 0), JSON.stringify(json, null, 4));
-
-		return vscode.workspace.applyEdit(edit);
+		vscode.workspace.applyEdit(edit);
 	}
 
     private getHtmlForWebview(webview: vscode.Webview): string {

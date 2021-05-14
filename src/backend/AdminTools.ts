@@ -4,10 +4,11 @@ import * as fs from 'fs';
 import { Exercise, SavedExerciseAnswer, Gap, GapDirectory, SnippetDirectory, ParsonConfig } from '../model';
 
 export class AdminTools{
-    public static register(context: vscode.ExtensionContext){
-        vscode.commands.registerCommand('vscodeparsons.fileToProblem', this.fileToProblem);
-        vscode.commands.registerCommand('vscodeparsons.folderToProblem', this.folderToProblem);
-        vscode.commands.registerCommand('vscodeparsons.exportFile', this.exportFile);
+    public static register(context: vscode.ExtensionContext): Array<vscode.Disposable>{
+        let fileToProblem = vscode.commands.registerCommand('vscodeparsons.fileToProblem', this.fileToProblem);
+        let folderToProblem = vscode.commands.registerCommand('vscodeparsons.folderToProblem', this.folderToProblem);
+        let exportFile = vscode.commands.registerCommand('vscodeparsons.exportFile', this.exportFile);
+        return [fileToProblem, folderToProblem, exportFile];
     }
 
     private static fileToProblem(){
@@ -90,8 +91,7 @@ export class AdminTools{
             gaps = prevGaps;
         }
         const gapString = JSON.stringify(gaps, null, 4);
-        const writeBytes = Buffer.from(gapString);
-        vscode.workspace.fs.writeFile(vscode.Uri.file(fileName), writeBytes);
+        fs.writeFile(fileName, gapString, (err)=> {throw err;});
     }
 
     private static findGaps(folderPath: string, fileName: string): Array<Gap>{

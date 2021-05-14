@@ -2,9 +2,11 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { Exercise, SavedExerciseAnswer, Gap, GapDirectory, SnippetDirectory, ParsonConfig } from '../model';
+import { getCodeFilesInFolder } from './FileReader';
+import { generateNonce } from '../util';
 
 export class AdminTools{
-    public static register(context: vscode.ExtensionContext): Array<vscode.Disposable>{
+    public static register(): Array<vscode.Disposable>{
         let fileToProblem = vscode.commands.registerCommand('vscodeparsons.fileToProblem', this.fileToProblem);
         let folderToProblem = vscode.commands.registerCommand('vscodeparsons.folderToProblem', this.folderToProblem);
         let exportFile = vscode.commands.registerCommand('vscodeparsons.exportFile', this.exportFile);
@@ -43,7 +45,7 @@ export class AdminTools{
     private static updateFolder(folderPath: string){
         console.log("updateFolder", folderPath);
         AdminTools.createSnippetsFile(folderPath);
-        AdminTools.createGapsFile(folderPath);
+        //AdminTools.createGapsFile(folderPath);
         AdminTools.createParsonConfig(folderPath);
     }
 
@@ -59,7 +61,7 @@ export class AdminTools{
         }
     }
 
-    private static createGapsFile(folderPath: string){
+    /*private static createGapsFile(folderPath: string){
         const fileName = path.join(folderPath, "gaps.json");
         const folderContents = fs.readdirSync(folderPath);
         let gaps: GapDirectory = {};
@@ -92,7 +94,7 @@ export class AdminTools{
         }
         const gapString = JSON.stringify(gaps, null, 4);
         fs.writeFile(fileName, gapString, (err)=> {throw err;});
-    }
+    }*/
 
     private static findGaps(folderPath: string, fileName: string): Array<Gap>{
         const filePath = path.join(folderPath, fileName);
@@ -122,13 +124,23 @@ export class AdminTools{
     }
 
     private static exportFile(){
+        console.log("export");
         if(!vscode.window.activeTextEditor){return;}
         const document = vscode.window.activeTextEditor.document;
         const filePath = document.fileName;
         const folderPath = path.dirname(filePath);
+        const codeFiles = getCodeFilesInFolder(folderPath);
+        const gaps: GapDirectory = {};
+        const files: {[key: string]: string} = {};
+        //console.log(codeFiles);
 
+        codeFiles.forEach(filename => {
+            const extracted = AdminTools.extractGaps(fs.readFileSync(path.join(folderPath, filename), 'utf-8'));
+            gaps[filename] = extracted.gaps;
+            files[filename] = extracted.codeFile;
+        });
+        
         const parsonConfig = AdminTools.readFile<ParsonConfig>(path.join(folderPath, "parsonconfig.json"));
-        const gaps = AdminTools.readFile<GapDirectory>(path.join(folderPath, "gaps.json"));
         const snippets = AdminTools.readFile<SnippetDirectory>(path.join(folderPath, "snippets.json"));
         if(!parsonConfig.filename){
             parsonConfig.filename = parsonConfig.name;
@@ -139,7 +151,7 @@ export class AdminTools{
             files: Object.keys(gaps).map(fileName => {
                 return {
                     name: fileName,
-                    text: fs.readFileSync(path.join(folderPath, fileName), 'utf-8'),
+                    text: files[fileName],
                     gaps: gaps[fileName]
                 };
             }),
@@ -160,6 +172,40 @@ export class AdminTools{
         console.log("parsondef folder verified");
         fs.writeFileSync(path.join(workspaceFolder, parsonConfig.output.parsondef, `${parsonConfig.filename}.parsondef`),JSON.stringify(parsondef, null, 4));
         console.log("parsondef file created");
+    }
+
+    private static createGap(){
+        vscode.window.activeTextEditor?.selection;
+    }
+    
+
+    private static extractGaps(codeFile: string): {codeFile: string, gaps: Array<Gap>}{
+        const gaps: Array<Gap> = [];
+        const regexp = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",);
+        const extraction = codeFile.match(regexp);
+        let cleanCodeFile = codeFile.slice();
+        console.log(extraction);
+        if(extraction){
+            const extractedGaps = extraction
+                .map(comment => comment.substring(comment.indexOf("{"), comment.lastIndexOf("}")+1))
+                .map(jsonString => JSON.parse(jsonString));
+            console.log(cleanCodeFile);
+            extraction.forEach(comment => {
+                const index = cleanCodeFile.indexOf(comment);
+                cleanCodeFile = cleanCodeFile.slice(0, index)+cleanCodeFile.slice(index+comment.length);
+                console.log(comment, index, cleanCodeFile);
+            });
+            extractedGaps
+                .forEach(gap => {
+                    let nonce = generateNonce(12);
+                    gap.nonce = nonce;
+                    cleanCodeFile = cleanCodeFile.replace(gap.text, `$parson{${nonce}}`);
+                    gaps.push({id: nonce, type: gap.type, width: gap.width});
+                    console.log(cleanCodeFile);
+                });
+        }
+        console.log(cleanCodeFile, gaps);
+        return {codeFile: cleanCodeFile, gaps};
     }
 
     private static verifyFolder(folderPath: string){

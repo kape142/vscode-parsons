@@ -11,7 +11,7 @@ import { ParsonDecorationProvider } from './ParsonDecorationProvider';
 const disposables: Array<vscode.Disposable> = [];
 export function activate(context: vscode.ExtensionContext) {
 	let workspaceroot = vscode.workspace.workspaceFolders!![0].uri.fsPath;
-	let adminCommands = AdminTools.register(context);
+	let adminCommands = AdminTools.register();
 	let decorationProvider = ParsonDecorationProvider.register(workspaceroot);
 	let parsonViewerResult = ParsonViewerProvider.register(context, decorationProvider.it, workspaceroot);
 	context.subscriptions.push(parsonViewerResult.disposable);

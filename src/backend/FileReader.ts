@@ -85,6 +85,14 @@ export function getParsonFilesInFolder(filePath: string, previousPath?: string):
     return [];
 }
 
+export function getCodeFilesInFolder(filePath: string): string[]{
+    if(fileExists(filePath)){
+        const files = readdirSync(filePath);
+        return files.filter(file => !file.endsWith(".parson") && file !== "snippets.json" && file !== "parsonconfig.json");
+    }
+    return [];
+}
+
 function folderFilter(file: string): boolean{
     return !file.includes(".") && file !== "node_modules" && file !== "dist" && file !== "out" && file !== ".parson";
 }

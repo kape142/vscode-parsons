@@ -1,0 +1,10 @@
+{
+    "dragdrop": [
+        "return cards.size()",
+        "return cards.length",
+        "return cards.get(i)",
+        "return cards[i]",
+        "return String.valueOf(suit) + face",
+        "return \"[Deck \" + cards.toString().substring(1)"
+    ]
+}

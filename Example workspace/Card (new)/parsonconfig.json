@@ -1,0 +1,8 @@
+{
+    "output": {
+        "parson": "exampleFiles",
+        "parsondef": ".parson"
+    },
+    "name": "Øving 3 - Card (new)",
+    "includesSolution": false
+}

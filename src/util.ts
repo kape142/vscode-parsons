@@ -1,10 +1,16 @@
 import { Exercise, ExerciseFile, Gap, Snippet, ExerciseAnswer, SavedExerciseAnswer} from "./model";
 
 
-export let nonce = '';
-const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-for (let i = 0; i < 32; i++) {
-    nonce += possible.charAt(Math.floor(Math.random() * possible.length));
+export let nonce = generateNonce(32);
+
+
+export function generateNonce(length: number){
+    let n = "";
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < length; i++) {
+        n += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return n;
 }
 
 /* TODO:

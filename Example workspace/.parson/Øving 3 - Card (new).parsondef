@@ -1,0 +1,63 @@
+{
+    "name": "Øving 3 - Card (new)",
+    "files": [
+        {
+            "name": "Card.java",
+            "text": "public class Card {\r\n    \r\n    private char suit;\r\n    private int face = -1;\r\n    public final static String SUITS = \"SHDC\";\r\n    \r\n    public Card(char suit, int face) {\r\n        if (SUITS.indexOf(suit) < 0) {\r\n            throw new IllegalArgumentException(\"Illegal suit: \" + suit);\r\n        }\r\n        if (face < 1 || face > 13) {\r\n            throw new IllegalArgumentException(\"Illegal face: \" + face);\r\n        }\r\n        this.suit = suit;\r\n        this.face = face;\r\n    }\r\n    \r\n    public String toString() {\r\n        $parson{16mkEMJDKr8G};\r\n    }\r\n\r\n    public char getSuit() {\r\n        return this.suit;\r\n    }\r\n    \r\n    public int getFace() {\r\n        return this.face;\r\n    }\r\n}\r\n",
+            "gaps": [
+                {
+                    "id": "16mkEMJDKr8G",
+                    "type": "dragdrop",
+                    "width": 70
+                }
+            ]
+        },
+        {
+            "name": "CardDeck.java",
+            "text": "import java.util.ArrayList;\r\n\r\npublic class CardDeck {\r\n    \r\n    private ArrayList<Card> cards;\r\n\r\n    public CardDeck(int suitSize) {\r\n        cards = new ArrayList<Card>();\r\n        for (int i = 0; i < Card.SUITS.length(); i++) {\r\n            for (int face = 1; face <= suitSize; face++) {\r\n                Card card = new Card(Card.SUITS.charAt(i), face);\r\n                cards.add(card);\r\n            }\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public String toString() {\r\n        return $parson{SFq9mI2yaLRX};\r\n    }\r\n\r\n    public int getCardCount() {\r\n        $parson{U71o3JdMbpNH};\r\n    }\r\n    \r\n    public Card getCard(int i) {\r\n        if (i < 0 || i >= getCardCount()) {\r\n            throw new IllegalArgumentException(String.format(\"%s is an illegal card index, when the size of the deck is %s\", i, getCardCount()));\r\n        }\r\n        $parson{sdi5Z95bCkeN};\r\n    }\r\n    \r\n    public void shufflePerfectly() {\r\n        int halfSize = cards.size() / 2;\r\n        for (int i = 0; i < halfSize; i++) {\r\n            Card card = cards.remove(halfSize + i);\r\n            cards.add(i * 2 + 1, card);\r\n        }\r\n    }\r\n}\r\n",
+            "gaps": [
+                {
+                    "id": "SFq9mI2yaLRX",
+                    "type": "dragdrop",
+                    "width": 70
+                },
+                {
+                    "id": "U71o3JdMbpNH",
+                    "type": "dragdrop",
+                    "width": 35
+                },
+                {
+                    "id": "sdi5Z95bCkeN",
+                    "type": "dragdrop",
+                    "width": 35
+                }
+            ]
+        }
+    ],
+    "snippets": [
+        {
+            "text": "return cards.size()",
+            "id": 0
+        },
+        {
+            "text": "return cards.length",
+            "id": 1
+        },
+        {
+            "text": "return cards.get(i)",
+            "id": 2
+        },
+        {
+            "text": "return cards[i]",
+            "id": 3
+        },
+        {
+            "text": "return String.valueOf(suit) + face",
+            "id": 4
+        },
+        {
+            "text": "return \"[Deck \" + cards.toString().substring(1)",
+            "id": 5
+        }
+    ]
+}

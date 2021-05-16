@@ -201,29 +201,22 @@ export class AdminTools{
         const gaps: Array<Gap> = [];
         const regexp = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",);
         const extraction = codeFile.match(regexp);
-        let cleanCodeFile = codeFile.slice();
+        let updatedCodeFile = codeFile.slice();
         console.log(extraction);
         if(extraction){
-            const extractedGaps = extraction
-                .map(comment => comment.substring(comment.indexOf("{"), comment.lastIndexOf("}")+1))
-                .map(jsonString => JSON.parse(jsonString));
-            console.log(cleanCodeFile);
-            extraction.forEach(comment => {
-                const index = cleanCodeFile.indexOf(comment);
-                cleanCodeFile = cleanCodeFile.slice(0, index)+cleanCodeFile.slice(index+comment.length);
-                console.log(comment, index, cleanCodeFile);
-            });
-            extractedGaps
-                .forEach(gap => {
-                    let nonce = generateNonce(12);
-                    gap.nonce = nonce;
-                    cleanCodeFile = cleanCodeFile.replace(gap.text, `$parson{${nonce}}`);
-                    gaps.push({id: nonce, type: gap.type, width: gap.width});
-                    console.log(cleanCodeFile);
-                });
+            for(const comment of extraction){
+                const jsonString = comment.substring(comment.indexOf("{"), comment.lastIndexOf("}")+1);
+                const gap = JSON.parse(jsonString);
+                const nonce = generateNonce(12);
+                gap.id = nonce;
+                const newJsonString = JSON.stringify(gap);
+                updatedCodeFile = updatedCodeFile.replace(jsonString, newJsonString);
+                gaps.push({id: nonce, type: gap.type, width: gap.width});
+            }
         }
-        console.log(cleanCodeFile, gaps);
-        return {codeFile: cleanCodeFile, gaps};
+        console.log(updatedCodeFile);
+        console.log(gaps);
+        return {codeFile: updatedCodeFile, gaps};
     }
 
     private verifyFolder(folderPath: string){

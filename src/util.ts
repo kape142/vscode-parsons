@@ -6,7 +6,7 @@ export let nonce = generateNonce(32);
 
 export function generateNonce(length: number){
     let n = "";
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     for (let i = 0; i < length; i++) {
         n += possible.charAt(Math.floor(Math.random() * possible.length));
     }

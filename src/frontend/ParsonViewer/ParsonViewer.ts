@@ -1,4 +1,4 @@
-import {Exercise, ExerciseAnswer, Gap, Fetcher, Highlighter, Snippet, Answer} from "../../model";
+import {Exercise, ExerciseAnswer, Gap, Fetcher, Highlighter, Snippet, Answer, GapWithText} from "../../model";
 import {parseExerciseAnswer, ElementMap} from "../../util";
 import "./ParsonViewer.less";
 
@@ -42,6 +42,19 @@ export default class ParsonViewer{
         this.shownFile = filename;
     }
 
+    private extractGaps(codeFile: string): {codeFile: string, gaps: Array<Gap>}{
+        const gaps: Array<Gap> = [];
+        const regexp = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",);
+        const extraction = codeFile.match(regexp);
+        let cleanCodeFile = codeFile.slice();
+        console.log(extraction);
+        if(extraction){
+            
+        }
+        console.log(cleanCodeFile, gaps);
+        return {codeFile, gaps};
+    }
+
     updateContent(text: string) {
 		let exerciseAnswer: ExerciseAnswer;
 		try {
@@ -58,27 +71,48 @@ export default class ParsonViewer{
 
 		// Render the code
 		this.code.innerHTML = '';
+        const gapFinder = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",);
 		for (const file of exercise.files) {
             if(!this.shownFile){
                 this.showFile(file.name);
             }
-            file.gaps.forEach(gap => {
-                //this.fetcher.log(gap.id);
-                file.text = file.text.replace(new RegExp(`(<.*>)?\\$(<.*>)?parson(<.*>)?{(<.*>)?${gap.id}(<.*>)?}`), `/*${gap.id}*/`);
-            });
-            //this.fetcher.log(file.text);
-            const highlightedCode = this.highlighter.addHighlighting("java", file.text);
+            const extraction = file.text.match(gapFinder);
+            this.fetcher.log(file.text);
+            if(extraction){
+                extraction
+                    .reverse()
+                    .map(comment => {
+                        return {
+                            jsonString: comment.substring(comment.indexOf("{"), comment.lastIndexOf("}")+1),
+                            index: file.text.indexOf(comment)
+                        };})
+                    .map(data => {
+                        return {
+                            gap: JSON.parse(data.jsonString) as GapWithText,
+                            index: data.index
+                        };})
+                    .forEach(data => {
+                        file.text = this.replaceMostRecent(file.text, data.gap.text, `/*${data.gap.id}*/`, data.index); //should search upwards
+                    });
+                extraction.forEach(comment => {
+                    const index = file.text.indexOf(comment);
+                    file.text = file.text.slice(0, index)+file.text.slice(index+comment.length);
+                });
+            }
+            let highlightedCode = this.highlighter.addHighlighting("java", file.text);
+            this.fetcher.log(highlightedCode);
+            
             const element = document.createElement('div');
             element.className = 'file';
             element.id = `exercise-file-${file.name}`;
 			this.code.appendChild(element);
             let innerHTML = highlightedCode;
             //this.fetcher.log(highlightedCode);
+            //this.fetcher.log(innerHTML);
             file.gaps.forEach(gap => {
                 //this.fetcher.log(gap.id);
                 innerHTML = innerHTML.replace(new RegExp(`(<span class="hljs-comment">)?\\/\\*(<span class="hljs-title">)?${gap.id}(</span>)?\\*\\/(</span>)?`), this.createGapObject(gap));
             });
-            //this.fetcher.log(innerHTML);
             element.innerHTML = innerHTML;
 		}
 
@@ -178,6 +212,32 @@ export default class ParsonViewer{
         document.getElementById(`exercise-file-${this.shownFile}`)?.classList.add("file-show");
 	}
 
+    private replaceMostRecent(text: string, searchValue: string, replaceValue: string, startIndex: number): string{
+        this.log(text, searchValue, replaceValue, ""+startIndex);
+        let lastIndex = text.indexOf(searchValue);
+        this.log(""+lastIndex);
+        while(lastIndex >= 0 && lastIndex < startIndex){
+            this.log(""+lastIndex);
+            const index = text.indexOf(searchValue, lastIndex+1);
+            if(index < startIndex && index >= 0){
+                lastIndex = index;
+            }else{
+                break;
+            }
+        }
+        const newText = text.substring(0, lastIndex) + replaceValue + text.substring(lastIndex+searchValue.length);
+        this.log(""+lastIndex, newText);
+        return newText;
+    }
+
+    private createRegexpToIgnoreTags(text: string): RegExp{
+        const spanRegex = "[\\w]*(<.*>)*[\\w]*";
+        let regString = spanRegex+
+            text.split(/[^\w]/).join(spanRegex) +
+            spanRegex;
+        return new RegExp(regString);
+    }
+
     createGapObject(gap: Gap){
         let a =  `<span id="gap-${gap.id}" class="gap width-${gap.width}"> </span>`;
         //this.fetcher.log(a);
@@ -189,6 +249,10 @@ export default class ParsonViewer{
         textContent.innerText = line;
         textContent.className = "codeline";
         return textContent;
+    }
+
+    private log(...it: Array<string>){
+        it.forEach(it => this.fetcher.log(it));
     }
     
 }

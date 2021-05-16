@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 
-public class StockIndex implements StockListener{
+public class StockIndex implements StockListener {
 /*$parson{
     "text": "implements StockListener",
     "width": 48,
@@ -10,6 +10,11 @@ public class StockIndex implements StockListener{
 }*/
 	
 	private List<Stock> stocks = new ArrayList<>();
+    /*$parson{
+        "text": "ArrayList",
+        "width": 18,
+        "type": "dragdrop"
+    }*/
 	private double index = 0;
 
 	public StockIndex(String name, Stock... stocks) {

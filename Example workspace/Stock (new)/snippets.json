@@ -11,6 +11,7 @@
         "Stock stock",
         "double oldPrice",
         "double newPrice",
-        "implements StockListener"
+        "implements StockListener",
+        "getPrice"
     ]
 }

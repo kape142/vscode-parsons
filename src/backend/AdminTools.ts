@@ -4,19 +4,23 @@ import * as fs from 'fs';
 import { Exercise, SavedExerciseAnswer, Gap, GapDirectory, SnippetDirectory, ParsonConfig, DisposableWrapper } from '../model';
 import { getCodeFilesInFolder } from './FileReader';
 import { generateNonce } from '../util';
+import { ExerciseFile, ParsonExplorer } from './ParsonExplorer';
+import { ParsonViewerProvider } from './ParsonViewerProvider';
 
 export class AdminTools{
-    public static register(): DisposableWrapper<AdminTools>{
-        let adminTools = new AdminTools();
+    public static register(parsonExplorer: ParsonExplorer, parsonViewerProvider: ParsonViewerProvider): DisposableWrapper<AdminTools>{
+        let adminTools = new AdminTools(parsonExplorer, parsonViewerProvider);
         let fileToProblem = vscode.commands.registerCommand('vscodeparsons.fileToProblem', ()=>adminTools.fileToProblem());
         let folderToProblem = vscode.commands.registerCommand('vscodeparsons.folderToProblem', ()=>adminTools.folderToProblem());
         let exportFile = vscode.commands.registerCommand('vscodeparsons.exportFile', ()=>adminTools.exportFile());
         let registerGap = vscode.commands.registerCommand('vscodeparsons.registerGap', ()=>adminTools.createGap());
-        let disposable = vscode.Disposable.from(fileToProblem, folderToProblem, exportFile, registerGap);
+        let refreshEntries = vscode.commands.registerCommand('vscodeparsons.refreshEntries', ()=>adminTools.refreshEntries());
+        let refreshEntry = vscode.commands.registerCommand('vscodeparsons.refreshEntry', (exerciseFile)=>adminTools.refreshEntry(exerciseFile));
+        let disposable = vscode.Disposable.from(fileToProblem, folderToProblem, exportFile, registerGap, refreshEntries);
         return {it: adminTools, disposable};
     }
 
-    constructor(){
+    constructor(private parsonExplorer: ParsonExplorer, private parsonViewerProvider: ParsonViewerProvider){
 
     }
 
@@ -138,12 +142,15 @@ export class AdminTools{
         console.log(parson, parsondef, workspaceFolder, path.join(workspaceFolder, parsonConfig.output.parson, `${parsonConfig.filename}.parson`));
         this.verifyFolder(path.join(workspaceFolder, parsonConfig.output.parson));
         console.log("parson folder verified");
-        fs.writeFileSync(path.join(workspaceFolder, parsonConfig.output.parson, `${parsonConfig.filename}.parson`),JSON.stringify(parson, null, 4));
+        const parsonFileName = path.join(parsonConfig.output.parson, `${parsonConfig.filename}.parson`);
+        fs.writeFileSync(path.join(workspaceFolder, parsonFileName),JSON.stringify(parson, null, 4));
         console.log("parson file created");
         this.verifyFolder(path.join(workspaceFolder, parsonConfig.output.parsondef));
         console.log("parsondef folder verified");
         fs.writeFileSync(path.join(workspaceFolder, parsonConfig.output.parsondef, `${parsonConfig.filename}.parsondef`),JSON.stringify(parsondef, null, 4));
         console.log("parsondef file created");
+        this.parsonExplorer.onDidChangeTreeDataEmitter.fire();
+        this.parsonViewerProvider.updateFile(parsonFileName);
     }
 
     private createGap(){
@@ -153,7 +160,7 @@ export class AdminTools{
             const documentText = document.getText();
             const selectionText = document.getText(selection);
             const restOfText = document.getText().substring(document.offsetAt(selection.end));
-            console.log(selectionText, "\nrest: ", restOfText);
+            //console.log(selectionText, "\nrest: ", restOfText);
             const regexp = new RegExp("(\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/)+", "s",);
             const gapsForLine = restOfText.match(regexp);
             let writePos = new vscode.Position(selection.end.line+1, 0);
@@ -164,17 +171,17 @@ export class AdminTools{
             }
             const startOfLine = document.getText(new vscode.Range(new vscode.Position(selection.start.line,0), selection.end));
             const indentationIsTab = startOfLine.charAt(0) === "\t";
-            console.log("indentation:"+startOfLine.charAt(0)+"stop", indentationIsTab);
+            //console.log("indentation:"+startOfLine.charAt(0)+"stop", indentationIsTab);
             const indentations = (startOfLine.length - startOfLine.trim().length) / (indentationIsTab ? 1 : 4);
-            console.log(indentations, startOfLine.length, startOfLine.trim().length);
+            //console.log(indentations, startOfLine.length, startOfLine.trim().length);
             let gapText = `${this.indent(indentations)}/*$parson{\n`+
                 `${this.indent(indentations+1)}"text": "${selectionText.replace('"', '\\"')}",\n`+
                 `${this.indent(indentations+1)}"width": ${selectionText.length*2},\n`+
                 `${this.indent(indentations+1)}"type": "dragdrop"\n`+
                 `${this.indent(indentations)}}*/\n`;
-            console.log(gapText);
+            //console.log(gapText);
             let snippetUri = path.join(path.dirname(document.fileName), "snippets.json");
-            console.log(snippetUri, document.uri);
+            //console.log(snippetUri, document.uri);
             vscode.workspace.openTextDocument(snippetUri).then(snipDoc => {
                 let snippets = JSON.parse(snipDoc.getText()) as SnippetDirectory;
                 snippets.dragdrop.push(selectionText);
@@ -192,7 +199,7 @@ export class AdminTools{
         for(let i = 0; i < ind; i++){
             str+="    ";
         }
-        console.log("str", str);
+        //console.log("str", str);
         return str;
     }
     
@@ -202,7 +209,7 @@ export class AdminTools{
         const regexp = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",);
         const extraction = codeFile.match(regexp);
         let updatedCodeFile = codeFile.slice();
-        console.log(extraction);
+        //console.log(extraction);
         if(extraction){
             for(const comment of extraction){
                 const jsonString = comment.substring(comment.indexOf("{"), comment.lastIndexOf("}")+1);
@@ -214,9 +221,17 @@ export class AdminTools{
                 gaps.push({id: nonce, type: gap.type, width: gap.width});
             }
         }
-        console.log(updatedCodeFile);
-        console.log(gaps);
+        //console.log(updatedCodeFile);
+        //console.log(gaps);
         return {codeFile: updatedCodeFile, gaps};
+    }
+
+    private refreshEntries(){
+        this.parsonExplorer.onDidChangeTreeDataEmitter.fire();
+    }
+
+    private refreshEntry(a: ExerciseFile){
+        this.parsonViewerProvider.updateFile(a.uri);
     }
 
     private verifyFolder(folderPath: string){

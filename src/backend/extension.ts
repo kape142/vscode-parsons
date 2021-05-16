@@ -11,17 +11,18 @@ import { ParsonDecorationProvider } from './ParsonDecorationProvider';
 const disposables: Array<vscode.Disposable> = [];
 export function activate(context: vscode.ExtensionContext) {
 	let workspaceroot = vscode.workspace.workspaceFolders!![0].uri.fsPath;
-	let adminCommands = AdminTools.register();
+	let parsonExplorerResult = ParsonExplorer.register(workspaceroot);
 	let decorationProvider = ParsonDecorationProvider.register(workspaceroot);
 	let parsonViewerResult = ParsonViewerProvider.register(context, decorationProvider.it, workspaceroot);
 	context.subscriptions.push(parsonViewerResult.disposable);
+	let adminCommands = AdminTools.register(parsonExplorerResult.it, parsonViewerResult.it);
 	let displayFile = vscode.commands.registerCommand('parsonExplorer.displayFile', (filename, uri) => parsonViewerResult.it.showFile(filename, uri));
-	let parsonExplorer = ParsonExplorer.register(workspaceroot);
+	
 	
 	disposables.push(adminCommands.disposable);
 	disposables.push(parsonViewerResult.disposable);
 	disposables.push(displayFile);
-	disposables.push(parsonExplorer);
+	disposables.push(parsonExplorerResult.disposable);
 	disposables.push(decorationProvider.disposable);
 }
 

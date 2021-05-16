@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { nonce } from '../util';
-import { loadExercisesToString, getFilesFromText, loadExercises } from './FileReader';
+import { loadExercisesToString, getFilesFromText, loadExercises, readParsonFileToString } from './FileReader';
 import { SavedExerciseAnswer, Answer, ExerciseAnswer, DisposableWrapper} from '../model';
 import { ParsonDecorationProvider } from './ParsonDecorationProvider';
 
@@ -104,6 +104,16 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 				sendMessage({type: "show file", text: fileName});
 			}
 		});
+	}
+
+	public updateFile(uri: string): void{
+		console.log("update file send", uri);
+		const updatedfile = readParsonFileToString(uri, this.workspaceroot);
+		console.log(updatedfile);
+		let sendMessage = this.postMessage.get(uri);
+		if(sendMessage){
+			sendMessage({type: "update", text: updatedfile});
+		}
 	}
 
 	private removeAnswer(snippetId: string, document: vscode.TextDocument){

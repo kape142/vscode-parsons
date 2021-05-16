@@ -47,11 +47,11 @@ export default class ParsonViewer{
         const regexp = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",);
         const extraction = codeFile.match(regexp);
         let cleanCodeFile = codeFile.slice();
-        console.log(extraction);
+        //console.log(extraction);
         if(extraction){
             
         }
-        console.log(cleanCodeFile, gaps);
+        //console.log(cleanCodeFile, gaps);
         return {codeFile, gaps};
     }
 
@@ -77,7 +77,7 @@ export default class ParsonViewer{
                 this.showFile(file.name);
             }
             const extraction = file.text.match(gapFinder);
-            this.fetcher.log(file.text);
+            //this.fetcher.log(file.text);
             if(extraction){
                 extraction
                     .reverse()
@@ -100,7 +100,7 @@ export default class ParsonViewer{
                 });
             }
             let highlightedCode = this.highlighter.addHighlighting("java", file.text);
-            this.fetcher.log(highlightedCode);
+            //this.fetcher.log(highlightedCode);
             
             const element = document.createElement('div');
             element.className = 'file';
@@ -213,11 +213,11 @@ export default class ParsonViewer{
 	}
 
     private replaceMostRecent(text: string, searchValue: string, replaceValue: string, startIndex: number): string{
-        this.log(text, searchValue, replaceValue, ""+startIndex);
+        //this.log(text, searchValue, replaceValue, ""+startIndex);
         let lastIndex = text.indexOf(searchValue);
-        this.log(""+lastIndex);
+        //this.log(""+lastIndex);
         while(lastIndex >= 0 && lastIndex < startIndex){
-            this.log(""+lastIndex);
+            //this.log(""+lastIndex);
             const index = text.indexOf(searchValue, lastIndex+1);
             if(index < startIndex && index >= 0){
                 lastIndex = index;
@@ -226,7 +226,7 @@ export default class ParsonViewer{
             }
         }
         const newText = text.substring(0, lastIndex) + replaceValue + text.substring(lastIndex+searchValue.length);
-        this.log(""+lastIndex, newText);
+        //this.log(""+lastIndex, newText);
         return newText;
     }
 

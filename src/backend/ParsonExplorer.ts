@@ -1,18 +1,20 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import {ExerciseAnswer} from '../model';
+import {DisposableWrapper, ExerciseAnswer} from '../model';
 import { getParsonFilesInFolder, readParsonFileToString } from './FileReader';
 
 export class ParsonExplorer implements vscode.TreeDataProvider<ExerciseFile>{
 
-    public static register(workspaceroot: string): vscode.Disposable {
+    public static register(workspaceroot: string): DisposableWrapper<ParsonExplorer> {
         const parsonExplorer = new ParsonExplorer(workspaceroot);
-        return vscode.window.registerTreeDataProvider('parsonExplorer', parsonExplorer);
+        return {it: parsonExplorer, disposable: vscode.window.registerTreeDataProvider('parsonExplorer', parsonExplorer)};
     }
     constructor( private workspaceroot: string){}
 
-    onDidChangeTreeData?: vscode.Event<void | ExerciseFile | null | undefined> | undefined;
+    onDidChangeTreeDataEmitter = new vscode.EventEmitter<void>();
+
+    onDidChangeTreeData = this.onDidChangeTreeDataEmitter.event;
 
     getTreeItem(element: ExerciseFile): vscode.TreeItem | Thenable<vscode.TreeItem> {
         return element;
@@ -52,6 +54,9 @@ export class ExerciseFile extends vscode.TreeItem {
                 arguments: [label, uri]
             };
             this.resourceUri = vscode.Uri.parse(`parson:${path.join(uri, label)}`, true);
+            this.contextValue = "file";
+        }else{
+            this.contextValue = "exercise";
         }
         console.log("TreeItem constructor: ", uri, this.label, this.resourceUri);
     }    

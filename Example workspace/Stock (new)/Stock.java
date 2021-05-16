@@ -13,6 +13,11 @@ public class Stock {
 	}
 
 	public double getPrice() {
+    /*$parson{
+        "text": "getPrice",
+        "width": 16,
+        "type": "dragdrop"
+    }*/
 		return this.price;
 	}
 

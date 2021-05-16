@@ -18,6 +18,17 @@
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
+		"configuration": {
+			"title": "VS Code Parsons",
+			"properties": {
+				"vscodeparsons.enableRefreshing": {
+					"type": "boolean",
+					"scope": "application",
+					"default": false,
+					"description": "Enable refreshing the Parson Explorer and Parson files for development of exercises"
+				}
+			}
+		},
 		"customEditors": [
 			{
 				"viewType": "testExtension.parsonViewer",
@@ -45,6 +56,16 @@
 			{
 				"command": "vscodeparsons.registerGap",
 				"title": "Make a gap from the currently selected text"
+			},
+			{
+				"command": "vscodeparsons.refreshEntries",
+				"title": "Refresh list of entries in the Parson Explorer",
+				"icon": "$(extensions-refresh)"
+			},
+			{
+				"command": "vscodeparsons.refreshEntry",
+				"title": "Refresh the contents of this file",
+				"icon": "$(extensions-refresh)"
 			}
 		],
 		"views": {
@@ -52,6 +73,22 @@
 				{
 					"id": "parsonExplorer",
 					"name": "Parson Explorer"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "vscodeparsons.refreshEntries",
+					"when": "view == parsonExplorer && config.vscodeparsons.enableRefreshing == true",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "vscodeparsons.refreshEntry",
+					"when": "view == parsonExplorer && viewItem == exercise && config.vscodeparsons.enableRefreshing == true",
+					"group": "inline"
 				}
 			]
 		}

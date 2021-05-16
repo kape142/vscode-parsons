@@ -18,7 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
 	let displayFile = vscode.commands.registerCommand('parsonExplorer.displayFile', (filename, uri) => parsonViewerResult.it.showFile(filename, uri));
 	let parsonExplorer = ParsonExplorer.register(workspaceroot);
 	
-	disposables.push(...adminCommands);
+	disposables.push(adminCommands.disposable);
 	disposables.push(parsonViewerResult.disposable);
 	disposables.push(displayFile);
 	disposables.push(parsonExplorer);

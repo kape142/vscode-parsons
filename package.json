@@ -41,6 +41,10 @@
 			{
 				"command": "vscodeparsons.exportFile",
 				"title": "Export Parsons Problem to file"
+			},
+			{
+				"command": "vscodeparsons.registerGap",
+				"title": "Make a gap from the currently selected text"
 			}
 		],
 		"views": {

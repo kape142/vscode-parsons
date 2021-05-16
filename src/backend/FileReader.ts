@@ -36,7 +36,7 @@ export function loadExercises(parson: SavedExerciseAnswer, workspaceroot: string
             //console.log("read:", fileRead);
             const exerciseAnswer: ExerciseAnswer = {
                 exercise: JSON.parse(fileRead),
-                answers: parson.answers       
+                answers: parson.answers
             };
             return exerciseAnswer;
         }

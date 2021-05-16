@@ -2,76 +2,19 @@
     "name": "Øving 6 - Stock",
     "files": [
         {
+            "name": "gaps.json",
+            "text": "{\r\n    \"Stock.java\": [\r\n        {\r\n            \"id\": \"fireThis\",\r\n            \"width\": 17,\r\n            \"type\": \"dragdrop\"\r\n        },\r\n        {\r\n            \"id\": \"fireOldPrice\",\r\n            \"width\": 17,\r\n            \"type\": \"dragdrop\"\r\n        },\r\n        {\r\n            \"id\": \"fireThisPrice\",\r\n            \"width\": 17,\r\n            \"type\": \"dragdrop\"\r\n        },\r\n        {\r\n            \"id\": \"firePriceChanged\",\r\n            \"width\": 37,\r\n            \"type\": \"dragdrop\"\r\n        },\r\n        {\r\n            \"id\": \"listenersAdd\",\r\n            \"width\": 37,\r\n            \"type\": \"dragdrop\"\r\n        }\r\n    ],\r\n    \"StockIndex.java\": [\r\n        {\r\n            \"id\": \"override\",\r\n            \"width\": 20,\r\n            \"type\": \"dragdrop\"\r\n        },\r\n        {\r\n            \"id\": \"changeStock\",\r\n            \"width\": 22,\r\n            \"type\": \"dragdrop\"\r\n        },\r\n        {\r\n            \"id\": \"changeOldPrice\",\r\n            \"width\": 22,\r\n            \"type\": \"dragdrop\"\r\n        },\r\n        {\r\n            \"id\": \"changeNewPrice\",\r\n            \"width\": 22,\r\n            \"type\": \"dragdrop\"\r\n        },\r\n        {\r\n            \"id\": \"addListener\",\r\n            \"width\": 38,\r\n            \"type\": \"dragdrop\"\r\n        },\r\n        {\r\n            \"id\": \"addPrice\",\r\n            \"width\": 38,\r\n            \"type\": \"dragdrop\"\r\n        },\r\n        {\r\n            \"id\": \"implementsStockListener\",\r\n            \"width\": 40,\r\n            \"type\": \"dragdrop\"\r\n        }\r\n    ],\r\n    \"StockListener.java\": []\r\n}",
+            "gaps": []
+        },
+        {
             "name": "Stock.java",
             "text": "import java.util.ArrayList;\r\nimport java.util.List;\r\n\r\npublic class Stock {\r\n\r\n    private final String ticker;\r\n    private double price;\r\n    private List<StockListener> listeners = new ArrayList<StockListener>();\r\n    \r\n    public Stock(String ticker, double price) {\r\n        this.ticker = ticker;\r\n        this.price = price;\r\n    }\r\n\r\n    public double getPrice() {\r\n        return this.price;\r\n    }\r\n\r\n    public void setPrice(double newPrice) {\r\n        double oldPrice = this.price;\r\n        this.price = newPrice;\r\n        if (this.price != oldPrice) {\r\n            $parson{firePriceChanged};\r\n        }\r\n    }\r\n    \r\n    public void addStockListener(StockListener listener) {\r\n        $parson{listenersAdd};\r\n    }\r\n\r\n    protected void firePriceChanged(double oldPrice) {\r\n        for (StockListener listener : listeners) {\r\n            listener.stockPriceChanged($parson{fireThis}, $parson{fireOldPrice}, $parson{fireThisPrice});\r\n        }\r\n    }\r\n}\r\n",
-            "gaps": [
-                {
-                    "id": "fireThis",
-                    "width": 17,
-                    "type": "dragdrop"
-                },
-                {
-                    "id": "fireOldPrice",
-                    "width": 17,
-                    "type": "dragdrop"
-                },
-                {
-                    "id": "fireThisPrice",
-                    "width": 17,
-                    "type": "dragdrop"
-                },
-                {
-                    "id": "firePriceChanged",
-                    "width": 37,
-                    "type": "dragdrop"
-                },
-                {
-                    "id": "listenersAdd",
-                    "width": 37,
-                    "type": "dragdrop"
-                }
-            ]
+            "gaps": []
         },
         {
             "name": "StockIndex.java",
             "text": "import java.util.ArrayList;\r\nimport java.util.List;\r\nimport java.util.Arrays;\r\n\r\npublic class StockIndex $parson{implementsStockListener} {\r\n    \r\n    private List<Stock> stocks = new ArrayList<>();\r\n    private double index = 0;\r\n\r\n    public StockIndex(Stock... stocks) {\r\n        this.stocks.addAll(List.of(stocks));\r\n        for (Stock s : stocks) {\r\n            $parson{addPrice};\r\n            $parson{addListener};\r\n        }\r\n    }\r\n    \r\n    $parson{override}\r\n    public void stockPriceChanged($parson{changeStock}, $parson{changeOldPrice}, $parson{changeNewPrice}) {\r\n        this.index += newPrice - oldPrice;\r\n    }\r\n\r\n    public static void main(String[] args){\r\n        Stock tesla = new Stock(\"TSLA\", 100.0);\r\n        Stock apple = new Stock(\"AAPL\", 200,0);\r\n        StockIndex stockIndex = new StockIndex(tesla, apple);\r\n        // should print 300.0\r\n        System.out.println(stockIndex.index);\r\n        tesla.setPrice(110.0);\r\n        // should print 310.0\r\n        System.out.println(stockIndex.index);\r\n    }\r\n}\r\n",
-            "gaps": [
-                {
-                    "id": "override",
-                    "width": 20,
-                    "type": "dragdrop"
-                },
-                {
-                    "id": "changeStock",
-                    "width": 22,
-                    "type": "dragdrop"
-                },
-                {
-                    "id": "changeOldPrice",
-                    "width": 22,
-                    "type": "dragdrop"
-                },
-                {
-                    "id": "changeNewPrice",
-                    "width": 22,
-                    "type": "dragdrop"
-                },
-                {
-                    "id": "addListener",
-                    "width": 38,
-                    "type": "dragdrop"
-                },
-                {
-                    "id": "addPrice",
-                    "width": 38,
-                    "type": "dragdrop"
-                },
-                {
-                    "id": "implementsStockListener",
-                    "width": 40,
-                    "type": "dragdrop"
-                }
-            ]
+            "gaps": []
         },
         {
             "name": "StockListener.java",

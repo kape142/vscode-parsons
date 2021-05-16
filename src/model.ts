@@ -30,13 +30,13 @@ export interface Answer{
 }
 
 export interface SavedExerciseAnswer{
-    //customSnippets: Array<Snippet>
+    customSnippets?: Array<Snippet>
     parsonDef: Exercise | string
     answers: Array<Answer>
 }
 
 export interface ExerciseAnswer{
-    //customSnippets: Array<Snippet>
+    customSnippets?: Array<Snippet>
     exercise: Exercise
     answers: Array<Answer>
 }

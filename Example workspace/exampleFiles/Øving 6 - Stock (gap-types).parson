@@ -1,0 +1,37 @@
+{
+    "parsonDef": "Øving 6 - Stock (gap-types)",
+    "answers": [
+        {
+            "gap": {
+                "id": "dsHjBLkyZvMR",
+                "type": "write",
+                "width": 18
+            },
+            "snippet": {
+                "text": "av",
+                "id": 1002
+            }
+        },
+        {
+            "gap": {
+                "id": "UAoLZagcweCa",
+                "type": "write",
+                "width": 48
+            },
+            "snippet": {
+                "text": "asasd",
+                "id": 1001
+            }
+        }
+    ],
+    "customSnippets": [
+        {
+            "text": "av",
+            "id": 1002
+        },
+        {
+            "text": "asasd",
+            "id": 1001
+        }
+    ]
+}

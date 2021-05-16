@@ -42,19 +42,6 @@ export default class ParsonViewer{
         this.shownFile = filename;
     }
 
-    private extractGaps(codeFile: string): {codeFile: string, gaps: Array<Gap>}{
-        const gaps: Array<Gap> = [];
-        const regexp = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",);
-        const extraction = codeFile.match(regexp);
-        let cleanCodeFile = codeFile.slice();
-        //console.log(extraction);
-        if(extraction){
-            
-        }
-        //console.log(cleanCodeFile, gaps);
-        return {codeFile, gaps};
-    }
-
     updateContent(text: string) {
 		let exerciseAnswer: ExerciseAnswer;
 		try {
@@ -114,6 +101,27 @@ export default class ParsonViewer{
                 innerHTML = innerHTML.replace(new RegExp(`(<span class="hljs-comment">)?\\/\\*(<span class="hljs-title">)?${gap.id}(</span>)?\\*\\/(</span>)?`), this.createGapObject(gap));
             });
             element.innerHTML = innerHTML;
+            file.gaps
+                .filter(gap => gap.type === "write")
+                .forEach(gap => {
+                    const el: HTMLInputElement= document.getElementById(`gap-${gap.id}`) as HTMLInputElement;
+                    const submit = (ev: FocusEvent|KeyboardEvent) => {
+                        if(el.value){
+                            this.fetcher.message({gap, snippet: {text: el.value, id: -1}}, "add answer");
+                        }else if(el.dataset.snippetId){
+                            this.fetcher.message(el.dataset.snippetId, "remove answer");
+                        }
+                    };
+                    el.onblur = submit;
+                    el.onkeydown = (ev: KeyboardEvent) => {
+                        if (ev.key === "Enter"){
+                            submit(ev);
+                        }
+                    };
+                    el.onclick = (ev: MouseEvent) => {
+                        el.classList.remove("gap-filled");
+                    };
+                });
 		}
 
         this.snippets.innerHTML = "";
@@ -145,21 +153,26 @@ export default class ParsonViewer{
         for(const answer of exerciseAnswer.answers){
             let el = document.getElementById(`gap-${answer.gap.id}`);
             if(el){
+                el.classList.add("gap-filled");
+                el.innerText = answer.snippet.text;
                 let snip = document.getElementById(`snippet-${answer.snippet.id}`);
                 if(snip){
                     snip.style.display = "none";
-                    el.classList.add("filled");
-                    el.innerText = answer.snippet.text;
                     el.dataset.snippetId = `${answer.snippet.id}`;
+                }
+                if(el.classList.contains("gap-write")){
+                    const input: HTMLInputElement = el as HTMLInputElement;
+                    input.value = answer.snippet.text;
+                    input.dataset.snippetId = `${answer.snippet.id}`;
                 }
             }
         }
 
-        exerciseAnswer.exercise.files.forEach(file => {
+        exercise.files.forEach(file => {
             file.gaps.forEach(gap => {
                 let el = document.getElementById(`gap-${gap.id}`);
                 if(el){
-                    if(el?.dataset.snippetId){
+                    if(el?.dataset.snippetId && gap.type === "dragdrop"){
                         el.draggable = true;
                     }
                     el.ondragover = (ev: DragEvent) => {
@@ -230,18 +243,15 @@ export default class ParsonViewer{
         return newText;
     }
 
-    private createRegexpToIgnoreTags(text: string): RegExp{
-        const spanRegex = "[\\w]*(<.*>)*[\\w]*";
-        let regString = spanRegex+
-            text.split(/[^\w]/).join(spanRegex) +
-            spanRegex;
-        return new RegExp(regString);
-    }
-
     createGapObject(gap: Gap){
-        let a =  `<span id="gap-${gap.id}" class="gap width-${gap.width}"> </span>`;
-        //this.fetcher.log(a);
-        return a;
+        switch(gap.type){
+            case "dragdrop": return `<span id="gap-${gap.id}" class="gap gap-dragdrop width-${gap.width}"> </span>`;
+            case "dropdown": return this.createDropDownGap(gap);
+            case "write": return `<input id="gap-${gap.id}" class="gap gap-write width-${gap.width}"> </input>`;
+        }
+    }
+    createDropDownGap(gap: Gap){
+        return `<select id=${gap.id}>`;
     }
 
     createCodeLineSegment(line: string){
@@ -251,7 +261,7 @@ export default class ParsonViewer{
         return textContent;
     }
 
-    private log(...it: Array<string>){
+    private log(...it: Array<string | object>){
         it.forEach(it => this.fetcher.log(it));
     }
     

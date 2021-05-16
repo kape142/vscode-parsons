@@ -79,7 +79,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 		webviewPanel.webview.onDidReceiveMessage(e => {
 			switch (e.type) {
 				case 'log':
-					console.log(e.text);
+					console.log("log: ", e.text);
                     return;
 				case 'remove answer':
 					this.removeAnswer(e.text, document);
@@ -119,6 +119,9 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 	private removeAnswer(snippetId: string, document: vscode.TextDocument){
 		const parson: SavedExerciseAnswer = this.getDocumentAsSavedExerciseAnswer(document);
 		parson.answers = parson.answers.filter(answer => answer.snippet.id !== Number(snippetId));
+		if(parson.customSnippets){
+			parson.customSnippets = parson.customSnippets.filter(snip => snip.id !== Number(snippetId));
+		}
 		console.log(parson.answers, snippetId);
 		this.updateParsonDefFile(document, parson);
 	}
@@ -126,14 +129,32 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 	private addAnswer(answer: Answer, document: vscode.TextDocument){
 		const parson: SavedExerciseAnswer = this.getDocumentAsSavedExerciseAnswer(document);
 		console.log(parson.answers);
-		const otherSnippet = parson.answers.find(an => an.gap.id === answer.gap.id)?.snippet;
-		const otherGap = parson.answers.find(an => an.snippet.id === answer.snippet.id)?.gap;
-		parson.answers = parson.answers.filter(a => a.gap.id !== answer.gap.id && a.snippet.id !== answer.snippet.id);
-		if(otherSnippet && otherGap){
-			parson.answers.push({snippet: otherSnippet, gap: otherGap});
+		if(answer.snippet.id === -1){
+			if(!parson.customSnippets){
+				parson.customSnippets = [];
+			}
+			const prevSnippet = parson.answers.find(an => an.gap.id === answer.gap.id)?.snippet;
+			let nextId = 1000;
+			if(prevSnippet){
+				parson.customSnippets = parson.customSnippets.filter(snip => snip.id !== prevSnippet.id);
+				nextId = prevSnippet.id;
+			}else{
+				parson.customSnippets.forEach(snip => {nextId = snip.id > nextId ? snip.id : nextId;});
+				nextId++;
+			}
+			parson.answers = parson.answers.filter(a => a.gap.id !== answer.gap.id);
+			answer.snippet.id = nextId;
+			parson.customSnippets.push(answer.snippet);
+		}else{
+			const otherSnippet = parson.answers.find(an => an.gap.id === answer.gap.id)?.snippet;
+			const otherGap = parson.answers.find(an => an.snippet.id === answer.snippet.id)?.gap;
+			parson.answers = parson.answers.filter(a => a.gap.id !== answer.gap.id && a.snippet.id !== answer.snippet.id);
+			if(otherSnippet && otherGap){
+				parson.answers.push({snippet: otherSnippet, gap: otherGap});
+			}
 		}
 		parson.answers.push(answer);
-		console.log(parson.answers, answer, otherSnippet, otherGap);
+		console.log(parson.answers, answer);
 		this.updateParsonDefFile(document, parson);
 	}
 

@@ -34,7 +34,8 @@ public class StockIndex implements StockListener {
     /*$parson{
         "text": "@Override",
         "width": 18,
-        "type": "write"
+        "type": "dropdown",
+        "dropdown": "annotation"
     }*/
 	public void stockPriceChanged(Stock stock, double oldPrice, double newPrice) {
     /*$parson{

@@ -3,35 +3,73 @@
     "answers": [
         {
             "gap": {
-                "id": "dsHjBLkyZvMR",
-                "type": "write",
-                "width": 18
+                "id": "EKJmAvvUhooO",
+                "type": "dragdrop",
+                "width": 22
             },
             "snippet": {
-                "text": "av",
-                "id": 1002
+                "text": "Stock stock",
+                "id": 7
             }
         },
         {
             "gap": {
-                "id": "UAoLZagcweCa",
+                "id": "tMTeROojjZxF",
+                "type": "dragdrop",
+                "width": 30
+            },
+            "snippet": {
+                "text": "double oldPrice",
+                "id": 8
+            }
+        },
+        {
+            "gap": {
+                "id": "EoFZJpKSXoNe",
+                "type": "dragdrop",
+                "width": 30
+            },
+            "snippet": {
+                "text": "double newPrice",
+                "id": 9
+            }
+        },
+        {
+            "gap": {
+                "id": "ZQVFZhbyjTeT",
                 "type": "write",
                 "width": 48
             },
             "snippet": {
-                "text": "asasd",
+                "text": "implements Stocklisteners",
                 "id": 1001
+            }
+        },
+        {
+            "gap": {
+                "id": "noGqncIrSzvu",
+                "type": "dropdown",
+                "width": 18,
+                "options": [
+                    "@Override",
+                    "@Implement",
+                    "@Deprecated"
+                ]
+            },
+            "snippet": {
+                "text": "@Deprecated",
+                "id": 1002
             }
         }
     ],
     "customSnippets": [
         {
-            "text": "av",
-            "id": 1002
+            "text": "implements Stocklisteners",
+            "id": 1001
         },
         {
-            "text": "asasd",
-            "id": 1001
+            "text": "@Deprecated",
+            "id": 1002
         }
     ]
 }

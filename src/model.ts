@@ -21,7 +21,9 @@ export interface Gap{
     id: string
     width: number
     type: "dragdrop" | "dropdown" | "write"
+    text?: string
     dropdown?: string
+    options?: Array<string>
 }
 
 export interface Answer{
@@ -46,14 +48,6 @@ export interface SnippetDirectory{
     dropdown: {
         [key:string]: Array<string>
     }
-}
-
-export interface GapWithText{
-    id: string
-    width: number
-    type: "dragdrop" | "dropdown" | "write"
-    text: string
-    dropdown?: string
 }
 
 export interface ParsonConfig{

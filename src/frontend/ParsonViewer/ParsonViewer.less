@@ -51,18 +51,32 @@ html, body{
             background-color: initial;
             cursor: grab;
         }
-    }   
+    }
 
     &-write{
         border-radius: 0;
         cursor: text;
+        font-family: unset;
+        font-size: unset;
         &.gap-filled{
             background-color: initial;
             color: unset;
-            font-family: unset;
-            font-size: unset;
         }
     }
+
+    &-dropdown{
+        cursor: pointer;
+        height: 17pt;
+        font-family: unset;
+        font-size: unset;
+        &.gap-filled{
+            background-color: initial;
+            color: unset;
+            & > option{
+                color: black;
+            }
+        }
+    }  
 }
 
 .snippet{

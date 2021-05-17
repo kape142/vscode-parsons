@@ -110,14 +110,16 @@ export class AdminTools{
         const files: {[key: string]: string} = {};
         //console.log(codeFiles);
 
+        const parsonConfig = this.readFile<ParsonConfig>(path.join(folderPath, "parsonconfig.json"));
+        const snippets = this.readFile<SnippetDirectory>(path.join(folderPath, "snippets.json"));
+
         codeFiles.forEach(filename => {
-            const extracted = this.extractGaps(fs.readFileSync(path.join(folderPath, filename), 'utf-8'));
+            const extracted = this.extractAndConvertGaps(fs.readFileSync(path.join(folderPath, filename), 'utf-8'), snippets);
             gaps[filename] = extracted.gaps;
             files[filename] = extracted.codeFile;
         });
         
-        const parsonConfig = this.readFile<ParsonConfig>(path.join(folderPath, "parsonconfig.json"));
-        const snippets = this.readFile<SnippetDirectory>(path.join(folderPath, "snippets.json"));
+        
         if(!parsonConfig.filename){
             parsonConfig.filename = parsonConfig.name;
         }
@@ -204,7 +206,7 @@ export class AdminTools{
     }
     
 
-    private extractGaps(codeFile: string): {codeFile: string, gaps: Array<Gap>}{
+    private extractAndConvertGaps(codeFile: string, snippets: SnippetDirectory): {codeFile: string, gaps: Array<Gap>}{
         const gaps: Array<Gap> = [];
         const regexp = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",);
         const extraction = codeFile.match(regexp);
@@ -213,12 +215,15 @@ export class AdminTools{
         if(extraction){
             for(const comment of extraction){
                 const jsonString = comment.substring(comment.indexOf("{"), comment.lastIndexOf("}")+1);
-                const gap = JSON.parse(jsonString);
+                const gap: Gap = JSON.parse(jsonString);
                 const nonce = generateNonce(12);
                 gap.id = nonce;
-                const newJsonString = JSON.stringify(gap);
+                if(gap.type === "dropdown"){
+                    gap.options = snippets.dropdown[gap.dropdown!];
+                }
+                const newJsonString = JSON.stringify({id: nonce, text: gap.text});
                 updatedCodeFile = updatedCodeFile.replace(jsonString, newJsonString);
-                gaps.push({id: nonce, type: gap.type, width: gap.width});
+                gaps.push({id: nonce, type: gap.type, width: gap.width, options: gap.options});
             }
         }
         //console.log(updatedCodeFile);

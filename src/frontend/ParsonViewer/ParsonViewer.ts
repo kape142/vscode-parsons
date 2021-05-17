@@ -1,4 +1,4 @@
-import {Exercise, ExerciseAnswer, Gap, Fetcher, Highlighter, Snippet, Answer, GapWithText} from "../../model";
+import {Exercise, ExerciseAnswer, Gap, Fetcher, Highlighter, Snippet, Answer} from "../../model";
 import {parseExerciseAnswer, ElementMap} from "../../util";
 import "./ParsonViewer.less";
 
@@ -43,6 +43,7 @@ export default class ParsonViewer{
     }
 
     updateContent(text: string) {
+        this.log(text);
 		let exerciseAnswer: ExerciseAnswer;
 		try {
 			exerciseAnswer = parseExerciseAnswer(text);
@@ -53,6 +54,7 @@ export default class ParsonViewer{
 			return;
 		}
         const exercise = exerciseAnswer.exercise;
+        this.log(exercise);
 		this.code.style.display = '';
 		this.errorContainer.style.display = 'none';
 
@@ -60,11 +62,12 @@ export default class ParsonViewer{
 		this.code.innerHTML = '';
         const gapFinder = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",);
 		for (const file of exercise.files) {
+            this.log(file);
             if(!this.shownFile){
                 this.showFile(file.name);
             }
             const extraction = file.text.match(gapFinder);
-            //this.fetcher.log(file.text);
+            this.fetcher.log(file.text);
             if(extraction){
                 extraction
                     .reverse()
@@ -75,11 +78,11 @@ export default class ParsonViewer{
                         };})
                     .map(data => {
                         return {
-                            gap: JSON.parse(data.jsonString) as GapWithText,
+                            gap: JSON.parse(data.jsonString) as {id: string, text: string},
                             index: data.index
                         };})
                     .forEach(data => {
-                        file.text = this.replaceMostRecent(file.text, data.gap.text, `/*${data.gap.id}*/`, data.index); //should search upwards
+                        file.text = this.replaceMostRecent(file.text, data.gap.text!, `/*${data.gap.id}*/`, data.index); //should search upwards
                     });
                 extraction.forEach(comment => {
                     const index = file.text.indexOf(comment);
@@ -87,17 +90,13 @@ export default class ParsonViewer{
                 });
             }
             let highlightedCode = this.highlighter.addHighlighting("java", file.text);
-            //this.fetcher.log(highlightedCode);
             
             const element = document.createElement('div');
             element.className = 'file';
             element.id = `exercise-file-${file.name}`;
 			this.code.appendChild(element);
             let innerHTML = highlightedCode;
-            //this.fetcher.log(highlightedCode);
-            //this.fetcher.log(innerHTML);
             file.gaps.forEach(gap => {
-                //this.fetcher.log(gap.id);
                 innerHTML = innerHTML.replace(new RegExp(`(<span class="hljs-comment">)?\\/\\*(<span class="hljs-title">)?${gap.id}(</span>)?\\*\\/(</span>)?`), this.createGapObject(gap));
             });
             element.innerHTML = innerHTML;
@@ -122,6 +121,24 @@ export default class ParsonViewer{
                         el.classList.remove("gap-filled");
                     };
                 });
+            file.gaps
+                .filter(gap => gap.type === "dropdown")
+                .forEach(gap => {
+                    const el: HTMLSelectElement = document.getElementById(`gap-${gap.id}`) as HTMLSelectElement;
+                    el.onchange = (ev: Event) => {
+                        if(el.value === ""){
+                            if(el.dataset.snippetId){
+                                this.fetcher.message(el.dataset.snippetId, "remove answer");
+                                el.classList.remove("gap-filled");
+                            }
+                        }else{
+                            this.fetcher.message({gap, snippet: {text: el.value, id: -1}}, "add answer");
+                        }
+                    };
+                    /*el.onclick = (ev: MouseEvent) => {
+                        el.classList.remove("gap-filled");
+                    };*/
+                });
 		}
 
         this.snippets.innerHTML = "";
@@ -130,17 +147,6 @@ export default class ParsonViewer{
             el.id = `snippet-${snip.id}`;
             el.className = "snippet";
             el.textContent = snip.text;
-            /*el.onclick = (event)=>{
-                if(this.selectedSnippet){
-                    this.snippetMap[this.selectedSnippet.id].classList.remove("snippet-selected");
-                    if(this.selectedSnippet.text === snip.text){
-                        this.selectedSnippet = undefined;
-                        return;
-                    }
-                }
-                this.selectedSnippet = snip;
-                el.classList.add("snippet-selected");
-            };*/
             el.draggable = true;
             el.ondragstart = (ev: DragEvent) => {
                 ev.dataTransfer?.setData("text/plain", `${snip.id}`);
@@ -154,16 +160,22 @@ export default class ParsonViewer{
             let el = document.getElementById(`gap-${answer.gap.id}`);
             if(el){
                 el.classList.add("gap-filled");
-                el.innerText = answer.snippet.text;
                 let snip = document.getElementById(`snippet-${answer.snippet.id}`);
                 if(snip){
                     snip.style.display = "none";
                     el.dataset.snippetId = `${answer.snippet.id}`;
                 }
-                if(el.classList.contains("gap-write")){
+                if(answer.gap.type === "write"){
                     const input: HTMLInputElement = el as HTMLInputElement;
                     input.value = answer.snippet.text;
                     input.dataset.snippetId = `${answer.snippet.id}`;
+                }
+                if(answer.gap.type === "dropdown"){
+                    const input: HTMLSelectElement = el as HTMLSelectElement;
+                    input.value = answer.snippet.text;
+                    input.dataset.snippetId = `${answer.snippet.id}`;
+                }else{
+                    el.innerText = answer.snippet.text;
                 }
             }
         }
@@ -251,7 +263,8 @@ export default class ParsonViewer{
         }
     }
     createDropDownGap(gap: Gap){
-        return `<select id=${gap.id}>`;
+        const options = [""].concat(gap.options!).map(option => `<option value=${option}>${option}</option>`).join("");
+        return `<select id=gap-${gap.id} class="gap gap-dropdown width-${gap.width}">${options}</select>`;
     }
 
     createCodeLineSegment(line: string){

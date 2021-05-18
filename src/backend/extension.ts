@@ -5,6 +5,7 @@ import { ParsonViewerProvider } from './ParsonViewerProvider';
 import { ParsonExplorer } from './ParsonExplorer';
 import { AdminTools } from './AdminTools';
 import { ParsonDecorationProvider } from './ParsonDecorationProvider';
+import { AnswerVerification } from './AnswerVerification';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -15,11 +16,13 @@ export function activate(context: vscode.ExtensionContext) {
 	let decorationProvider = ParsonDecorationProvider.register(workspaceroot);
 	let parsonViewerResult = ParsonViewerProvider.register(context, decorationProvider.it, workspaceroot);
 	context.subscriptions.push(parsonViewerResult.disposable);
-	let adminCommands = AdminTools.register(parsonExplorerResult.it, parsonViewerResult.it);
+	let adminCommands = AdminTools.register(parsonExplorerResult.it, parsonViewerResult.it, decorationProvider.it);
+	let answerVerification = AnswerVerification.register(workspaceroot);
 	let displayFile = vscode.commands.registerCommand('parsonExplorer.displayFile', (filename, uri) => parsonViewerResult.it.showFile(filename, uri));
 	
 	
 	disposables.push(adminCommands.disposable);
+	disposables.push(answerVerification.disposable);
 	disposables.push(parsonViewerResult.disposable);
 	disposables.push(displayFile);
 	disposables.push(parsonExplorerResult.disposable);

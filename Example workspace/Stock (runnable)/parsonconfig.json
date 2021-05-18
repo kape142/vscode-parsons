@@ -1,0 +1,11 @@
+{
+    "output": {
+        "parson": "exampleFiles",
+        "parsondef": ".parson",
+        "code": "dist"
+    },
+    "name": "Øving 6 - Stock (runnable)",
+    "includesSolution": false,
+    "runnable": true,
+    "entryPoint": "StockIndex"
+}

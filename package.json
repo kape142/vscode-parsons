@@ -66,6 +66,11 @@
 				"command": "vscodeparsons.refreshEntry",
 				"title": "Refresh the contents of this file",
 				"icon": "$(extensions-refresh)"
+			},
+			{
+				"command": "vscodeparsons.compileAndRun",
+				"title": "Compile the code in this task with the given answers and run the code",
+				"icon": "$(notebook-execute)"
 			}
 		],
 		"views": {
@@ -87,7 +92,12 @@
 			"view/item/context": [
 				{
 					"command": "vscodeparsons.refreshEntry",
-					"when": "view == parsonExplorer && viewItem == exercise && config.vscodeparsons.enableRefreshing == true",
+					"when": "view == parsonExplorer && viewItem =~ /[A-z]*[eE]xercise/ && config.vscodeparsons.enableRefreshing == true",
+					"group": "inline"
+				},
+				{
+					"command": "vscodeparsons.compileAndRun",
+					"when": "view == parsonExplorer && viewItem == runnableExercise",
 					"group": "inline"
 				}
 			]

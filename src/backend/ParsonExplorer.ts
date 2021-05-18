@@ -30,7 +30,8 @@ export class ParsonExplorer implements vscode.TreeDataProvider<ExerciseFile>{
             const read = readParsonFileToString(filename, this.workspaceroot);
             //console.log(filename, read);
             const parsed = JSON.parse(read) as ExerciseAnswer;
-            return new ExerciseFile(parsed.exercise.name, filename, parsed.exercise.files.map(file => file.name));
+            //console.log(filename, parsed.exercise.runnable);
+            return new ExerciseFile(parsed.exercise.name, filename, parsed.exercise.files.map(file => file.name), parsed.exercise.runnable);
         });
         console.log("files in folder: ", a);
         return a;
@@ -44,7 +45,8 @@ export class ExerciseFile extends vscode.TreeItem {
     constructor(
         public readonly label: string,
         public readonly uri: string,
-        public readonly files?: string[]
+        public readonly files?: string[],
+        runnable?: boolean
     ){
         super(label, files?vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None);
         if(!files){
@@ -56,7 +58,7 @@ export class ExerciseFile extends vscode.TreeItem {
             this.resourceUri = vscode.Uri.parse(`parson:${path.join(uri, label)}`, true);
             this.contextValue = "file";
         }else{
-            this.contextValue = "exercise";
+            this.contextValue = runnable? "runnableExercise" : "exercise";
         }
         console.log("TreeItem constructor: ", uri, this.label, this.resourceUri);
     }    

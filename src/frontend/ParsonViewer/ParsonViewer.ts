@@ -1,5 +1,5 @@
-import {Exercise, ExerciseAnswer, Gap, Fetcher, Highlighter, Snippet, Answer} from "../../model";
-import {parseExerciseAnswer, ElementMap} from "../../util";
+import {ExerciseAnswer, Gap, Fetcher, Highlighter, Snippet, Answer} from "../../model";
+import {parseExerciseAnswer, replaceMostRecent} from "../../util";
 import "./ParsonViewer.less";
 
 export default class ParsonViewer{
@@ -60,14 +60,13 @@ export default class ParsonViewer{
 
 		// Render the code
 		this.code.innerHTML = '';
-        const gapFinder = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",);
+        const gapFinder = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",); // TODO needs to handle comment blocks simultaneously
 		for (const file of exercise.files) {
             this.log(file);
             if(!this.shownFile){
                 this.showFile(file.name);
             }
             const extraction = file.text.match(gapFinder);
-            this.fetcher.log(file.text);
             if(extraction){
                 extraction
                     .reverse()
@@ -82,7 +81,7 @@ export default class ParsonViewer{
                             index: data.index
                         };})
                     .forEach(data => {
-                        file.text = this.replaceMostRecent(file.text, data.gap.text!, `/*${data.gap.id}*/`, data.index); //should search upwards
+                        file.text = replaceMostRecent(file.text, data.gap.text!, `/*${data.gap.id}*/`, data.index);
                     });
                 extraction.forEach(comment => {
                     const index = file.text.indexOf(comment);
@@ -236,24 +235,6 @@ export default class ParsonViewer{
 
         document.getElementById(`exercise-file-${this.shownFile}`)?.classList.add("file-show");
 	}
-
-    private replaceMostRecent(text: string, searchValue: string, replaceValue: string, startIndex: number): string{
-        //this.log(text, searchValue, replaceValue, ""+startIndex);
-        let lastIndex = text.indexOf(searchValue);
-        //this.log(""+lastIndex);
-        while(lastIndex >= 0 && lastIndex < startIndex){
-            //this.log(""+lastIndex);
-            const index = text.indexOf(searchValue, lastIndex+1);
-            if(index < startIndex && index >= 0){
-                lastIndex = index;
-            }else{
-                break;
-            }
-        }
-        const newText = text.substring(0, lastIndex) + replaceValue + text.substring(lastIndex+searchValue.length);
-        //this.log(""+lastIndex, newText);
-        return newText;
-    }
 
     createGapObject(gap: Gap){
         switch(gap.type){

@@ -2,25 +2,32 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { Exercise, SavedExerciseAnswer, Gap, GapDirectory, SnippetDirectory, ParsonConfig, DisposableWrapper } from '../model';
-import { getCodeFilesInFolder } from './FileReader';
+import { fileExists, getCodeFilesInFolder, readFile, verifyFolder } from './FileReader';
 import { generateNonce } from '../util';
 import { ExerciseFile, ParsonExplorer } from './ParsonExplorer';
 import { ParsonViewerProvider } from './ParsonViewerProvider';
+import { ParsonDecorationProvider } from './ParsonDecorationProvider';
 
 export class AdminTools{
-    public static register(parsonExplorer: ParsonExplorer, parsonViewerProvider: ParsonViewerProvider): DisposableWrapper<AdminTools>{
-        let adminTools = new AdminTools(parsonExplorer, parsonViewerProvider);
+    public static register(
+        parsonExplorer: ParsonExplorer,
+        parsonViewerProvider: ParsonViewerProvider,
+        decorationProvider: ParsonDecorationProvider): DisposableWrapper<AdminTools>{
+        let adminTools = new AdminTools(parsonExplorer, parsonViewerProvider, decorationProvider);
         let fileToProblem = vscode.commands.registerCommand('vscodeparsons.fileToProblem', ()=>adminTools.fileToProblem());
         let folderToProblem = vscode.commands.registerCommand('vscodeparsons.folderToProblem', ()=>adminTools.folderToProblem());
         let exportFile = vscode.commands.registerCommand('vscodeparsons.exportFile', ()=>adminTools.exportFile());
         let registerGap = vscode.commands.registerCommand('vscodeparsons.registerGap', ()=>adminTools.createGap());
         let refreshEntries = vscode.commands.registerCommand('vscodeparsons.refreshEntries', ()=>adminTools.refreshEntries());
         let refreshEntry = vscode.commands.registerCommand('vscodeparsons.refreshEntry', (exerciseFile)=>adminTools.refreshEntry(exerciseFile));
-        let disposable = vscode.Disposable.from(fileToProblem, folderToProblem, exportFile, registerGap, refreshEntries);
+        let disposable = vscode.Disposable.from(fileToProblem, folderToProblem, exportFile, registerGap, refreshEntries, refreshEntry);
         return {it: adminTools, disposable};
     }
 
-    constructor(private parsonExplorer: ParsonExplorer, private parsonViewerProvider: ParsonViewerProvider){
+    constructor(
+        private parsonExplorer: ParsonExplorer,
+        private parsonViewerProvider: ParsonViewerProvider,
+        private decorationProvider: ParsonDecorationProvider){
 
     }
 
@@ -62,7 +69,7 @@ export class AdminTools{
 
     private createSnippetsFile(folderPath: string){
         const fileName = path.join(path.join(folderPath, "snippets.json"));
-        if(!this.fileExists(fileName)){
+        if(!fileExists(fileName)){
             const snippets: SnippetDirectory = {
                 dragdrop: ["example"],
                 dropdown: {list: ["foo", "bar"]}
@@ -72,27 +79,19 @@ export class AdminTools{
         }
     }
 
-    private findGaps(folderPath: string, fileName: string): Array<Gap>{
-        const filePath = path.join(folderPath, fileName);
-        const fileContent = fs.readFileSync(filePath, 'utf-8');
-        return fileContent
-            .split("$parson{")
-            .slice(1)
-            .map(str => str.substr(0, str.indexOf("}")))
-            .filter(str => str.trim() !== "")
-            .map(str => {return {id: str, width: 20, type: "dragdrop"};});
-    }
-
     private createParsonConfig(folderPath: string){
         const fileName = path.join(folderPath, "parsonconfig.json");
-        if(!this.fileExists(fileName)){
+        if(!fileExists(fileName)){
             const parsonConfig: ParsonConfig = {
                 output: {
                     parson: "exampleFiles",
-                    parsondef: ".parson"
+                    parsondef: ".parson",
+                    code: "dist"
                 },
                 name: path.basename(folderPath),
-                includesSolution: false
+                includesSolution: false,
+                runnable: false,
+                entryPoint: ""
             };
             const parsonConfigString = JSON.stringify(parsonConfig, null, 4);
             fs.writeFile(fileName, parsonConfigString, (err)=> {throw err;});
@@ -110,8 +109,8 @@ export class AdminTools{
         const files: {[key: string]: string} = {};
         //console.log(codeFiles);
 
-        const parsonConfig = this.readFile<ParsonConfig>(path.join(folderPath, "parsonconfig.json"));
-        const snippets = this.readFile<SnippetDirectory>(path.join(folderPath, "snippets.json"));
+        const parsonConfig = readFile<ParsonConfig>(path.join(folderPath, "parsonconfig.json"));
+        const snippets = readFile<SnippetDirectory>(path.join(folderPath, "snippets.json"));
 
         codeFiles.forEach(filename => {
             const extracted = this.extractAndConvertGaps(fs.readFileSync(path.join(folderPath, filename), 'utf-8'), snippets);
@@ -133,7 +132,10 @@ export class AdminTools{
                     gaps: gaps[fileName]
                 };
             }),
-            snippets: snippets.dragdrop.map((snip, i) => {return {text: snip, id: i};})
+            snippets: snippets.dragdrop.map((snip, i) => {return {text: snip, id: i};}),
+            runnable: parsonConfig.runnable,
+            output: parsonConfig.output.code,
+            entryPoint: parsonConfig.entryPoint
         };
 
         const parson: SavedExerciseAnswer = {
@@ -142,17 +144,22 @@ export class AdminTools{
         };
         const workspaceFolder = vscode.workspace.workspaceFolders!![0].uri.fsPath;
         console.log(parson, parsondef, workspaceFolder, path.join(workspaceFolder, parsonConfig.output.parson, `${parsonConfig.filename}.parson`));
-        this.verifyFolder(path.join(workspaceFolder, parsonConfig.output.parson));
+        verifyFolder(path.join(workspaceFolder, parsonConfig.output.parson));
         console.log("parson folder verified");
         const parsonFileName = path.join(parsonConfig.output.parson, `${parsonConfig.filename}.parson`);
         fs.writeFileSync(path.join(workspaceFolder, parsonFileName),JSON.stringify(parson, null, 4));
         console.log("parson file created");
-        this.verifyFolder(path.join(workspaceFolder, parsonConfig.output.parsondef));
+        verifyFolder(path.join(workspaceFolder, parsonConfig.output.parsondef));
         console.log("parsondef folder verified");
         fs.writeFileSync(path.join(workspaceFolder, parsonConfig.output.parsondef, `${parsonConfig.filename}.parsondef`),JSON.stringify(parsondef, null, 4));
         console.log("parsondef file created");
-        this.parsonExplorer.onDidChangeTreeDataEmitter.fire();
-        this.parsonViewerProvider.updateFile(parsonFileName);
+        try{
+            this.refreshEntries();
+            this.refreshEntry({uri: parsonFileName, files: parsondef.files.map(file=>file.name)});
+        }catch(error){
+            console.log(error);
+            throw error;
+        }
     }
 
     private createGap(){
@@ -235,30 +242,12 @@ export class AdminTools{
         this.parsonExplorer.onDidChangeTreeDataEmitter.fire();
     }
 
-    private refreshEntry(a: ExerciseFile){
-        this.parsonViewerProvider.updateFile(a.uri);
-    }
-
-    private verifyFolder(folderPath: string){
-        try{
-            fs.accessSync(folderPath);
-        }catch(error){
-            fs.mkdirSync(folderPath);
-        }
-    }
-
-    private fileExists(filePath: string): boolean{
-        try{
-            fs.accessSync(filePath);
-        }catch(error){
-            return false;
-        }
-        return true;
-    }
-
-    private readFile<T>(filePath: string): T{
-        const text = fs.readFileSync(filePath, 'utf-8');
-        const result: T = JSON.parse(text);
-        return result;
+    private refreshEntry(exerciseFile: {uri: string, files?: Array<string>}){
+        this.parsonViewerProvider.updateFile(exerciseFile.uri);
+        exerciseFile.files?.forEach(file => {
+            const parsonUri = vscode.Uri.parse(`parson:${path.join(exerciseFile.uri, file)}`);
+            console.log("parsonUri: "+parsonUri.path);
+            this.decorationProvider.fileChangeEmitter.fire(parsonUri);
+        });
     }
 }

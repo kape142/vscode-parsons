@@ -1,0 +1,167 @@
+{
+    "parsonDef": "Øving 6 - Stock (runnable)",
+    "answers": [
+        {
+            "gap": {
+                "id": "zRsvZBLCzlCt",
+                "type": "dragdrop",
+                "width": 46
+            },
+            "snippet": {
+                "text": "listeners.add(listener)",
+                "id": 11
+            }
+        },
+        {
+            "gap": {
+                "id": "shegFQtDPKIX",
+                "type": "dragdrop",
+                "width": 52
+            },
+            "snippet": {
+                "text": "firePriceChanged(oldPrice)",
+                "id": 10
+            }
+        },
+        {
+            "gap": {
+                "id": "QrXMqchmeVMr",
+                "type": "dragdrop",
+                "width": 20
+            },
+            "snippet": {
+                "text": "this",
+                "id": 6
+            }
+        },
+        {
+            "gap": {
+                "id": "pSjbwDgYjbEr",
+                "type": "dragdrop",
+                "width": 20
+            },
+            "snippet": {
+                "text": "this.price",
+                "id": 5
+            }
+        },
+        {
+            "gap": {
+                "id": "VEMUzeVWgBXw",
+                "type": "dragdrop",
+                "width": 20
+            },
+            "snippet": {
+                "text": "oldPrice",
+                "id": 4
+            }
+        },
+        {
+            "gap": {
+                "id": "paVWrPrnJBXq",
+                "type": "dragdrop",
+                "width": 50
+            },
+            "snippet": {
+                "text": "s.addStockListener(this)",
+                "id": 7
+            }
+        },
+        {
+            "gap": {
+                "id": "sZyGjDaXetjL",
+                "type": "dragdrop",
+                "width": 50
+            },
+            "snippet": {
+                "text": "this.index += s.getPrice()",
+                "id": 9
+            }
+        },
+        {
+            "gap": {
+                "id": "MhYPLrPAXAwS",
+                "type": "dropdown",
+                "width": 18,
+                "options": [
+                    "@Deprecated",
+                    "@Override",
+                    "@Implement"
+                ]
+            },
+            "snippet": {
+                "text": "@Override",
+                "id": 1002
+            }
+        },
+        {
+            "gap": {
+                "id": "LnQQMUznYqfL",
+                "type": "dragdrop",
+                "width": 22
+            },
+            "snippet": {
+                "text": "Stock stock",
+                "id": 3
+            }
+        },
+        {
+            "snippet": {
+                "text": "double newPrice",
+                "id": 2
+            },
+            "gap": {
+                "id": "NfiOjaWOhQIg",
+                "type": "dragdrop",
+                "width": 30
+            }
+        },
+        {
+            "gap": {
+                "id": "rFINRWBltBVT",
+                "type": "dragdrop",
+                "width": 30
+            },
+            "snippet": {
+                "text": "double oldPrice",
+                "id": 1
+            }
+        },
+        {
+            "gap": {
+                "id": "pzPLepMCZmtl",
+                "type": "write",
+                "width": 14
+            },
+            "snippet": {
+                "text": "2",
+                "id": 1003
+            }
+        },
+        {
+            "gap": {
+                "id": "gCLQNypIYNyx",
+                "type": "write",
+                "width": 50
+            },
+            "snippet": {
+                "text": "implements StockListener",
+                "id": 1001
+            }
+        }
+    ],
+    "customSnippets": [
+        {
+            "text": "@Override",
+            "id": 1002
+        },
+        {
+            "text": "2",
+            "id": 1003
+        },
+        {
+            "text": "implements StockListener",
+            "id": 1001
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import {accessSync, constants, readFileSync, readdirSync} from 'fs';
+import {accessSync, constants, readFileSync, readdirSync, mkdirSync} from 'fs';
 import {SavedExerciseAnswer, ExerciseAnswer, Exercise, ExerciseFile} from '../model';
 import { workspace } from 'vscode';
 /* TODO:
@@ -98,7 +98,7 @@ function folderFilter(file: string): boolean{
 }
 
 
-function fileExists(path: string): boolean{
+export function fileExists(path: string): boolean{
     let found: boolean = false;
     try{
         accessSync(path, constants.R_OK);
@@ -108,4 +108,18 @@ function fileExists(path: string): boolean{
         console.log("error: ", err.message);
     }
     return found;
+}
+
+export function verifyFolder(folderPath: string){
+    try{
+        accessSync(folderPath);
+    }catch(error){
+        mkdirSync(folderPath);
+    }
+}
+
+export function readFile<T>(filePath: string): T{
+    const text = readFileSync(filePath, 'utf-8');
+    const result: T = JSON.parse(text);
+    return result;
 }

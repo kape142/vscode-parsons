@@ -153,12 +153,11 @@ export class AdminTools{
         console.log("parsondef folder verified");
         fs.writeFileSync(path.join(workspaceFolder, parsonConfig.output.parsondef, `${parsonConfig.filename}.parsondef`),JSON.stringify(parsondef, null, 4));
         console.log("parsondef file created");
-        try{
+        try{ // bytt til å trye i hver metode
             this.refreshEntries();
             this.refreshEntry({uri: parsonFileName, files: parsondef.files.map(file=>file.name)});
         }catch(error){
             console.log(error);
-            throw error;
         }
     }
 

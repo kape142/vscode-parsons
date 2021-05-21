@@ -4,7 +4,7 @@
         "parsondef": ".parson",
         "code": "dist"
     },
-    "name": "Øving 6 - Stock (runnable)",
+    "name": "Øving 6 - Stock",
     "includesSolution": false,
     "runnable": true,
     "entryPoint": "StockIndex"

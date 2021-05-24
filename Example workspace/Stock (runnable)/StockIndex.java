@@ -8,15 +8,14 @@ public class StockIndex implements StockListener {
     "width": 50,
     "type": "write"
 }*/
-    
+
     private List<Stock> stocks = new ArrayList<>();
     private double index = 0;
 
     public StockIndex(Stock... stocks) {
         this.stocks.addAll(List.of(stocks));
         for (Stock s : stocks) {
-            s.addStockListener(this);
-            /*$parson{
+            s.addStockListener(this);/*$parson{
                 "text": "s.addStockListener(this)",
                 "width": 50,
                 "type": "dragdrop"
@@ -25,23 +24,33 @@ public class StockIndex implements StockListener {
             /*$parson{
                 "text": "this.index += s.getPrice()",
                 "width": 50,
-                "type": "dragdrop"
+                "type": "dragdrop",
+                "options": [
+                    "this.stocks.add(s)"
+                ]
             }*/
         }
     }
-    
+
     @Override
     /*$parson{
         "text": "@Override",
-        "width": 18,
-        "type": "dropdown",
-        "dropdown": "annotation"
+        "width": 22,
+        "type": "dropdownDef",
+        "dropdown": "annotation",
+        "options": [
+            "@Implements",
+            "@Deprecated"
+        ]
     }*/
     public void stockPriceChanged(Stock stock, double oldPrice, double newPrice) {
     /*$parson{
         "text": "Stock stock",
         "width": 22,
-        "type": "dragdrop"
+        "type": "dragdrop",
+        "options": [
+            "String ticker"
+        ]
     }*/
     /*$parson{
         "text": "double oldPrice",
@@ -55,7 +64,7 @@ public class StockIndex implements StockListener {
     }*/
         this.index += newPrice - oldPrice;
     }
-    
+
     public static void main(String[] args){
         Stock tesla = new Stock("TSLA", 100.0);
         Stock apple = new Stock("AAPL", 200.0);
@@ -63,11 +72,6 @@ public class StockIndex implements StockListener {
         // should print 300.0
         System.out.println(stockIndex.index);
         tesla.setPrice(110.0);
-        /*$parson{
-            "text": "110.0",
-            "width": 14,
-            "type": "write"
-        }*/
         // should print 310.0
         System.out.println(stockIndex.index);
     }

@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { nonce } from '../util';
+import { generateNonce, nonce } from '../util';
 import { loadExercisesToString, getFilesFromText, loadExercises, readParsonFileToString } from './FileReader';
 import { SavedExerciseAnswer, Answer, ExerciseAnswer, DisposableWrapper} from '../model';
 import { ParsonDecorationProvider } from './ParsonDecorationProvider';
@@ -118,10 +118,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 
 	private removeAnswer(snippetId: string, document: vscode.TextDocument){
 		const parson: SavedExerciseAnswer = this.getDocumentAsSavedExerciseAnswer(document);
-		parson.answers = parson.answers.filter(answer => answer.snippet.id !== Number(snippetId));
-		if(parson.customSnippets){
-			parson.customSnippets = parson.customSnippets.filter(snip => snip.id !== Number(snippetId));
-		}
+		parson.answers = parson.answers.filter(answer => answer.snippet.id !==snippetId);
 		console.log(parson.answers, snippetId);
 		this.updateParsonDefFile(document, parson);
 	}
@@ -129,22 +126,9 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 	private addAnswer(answer: Answer, document: vscode.TextDocument){
 		const parson: SavedExerciseAnswer = this.getDocumentAsSavedExerciseAnswer(document);
 		console.log(parson.answers);
-		if(answer.snippet.id === -1){
-			if(!parson.customSnippets){
-				parson.customSnippets = [];
-			}
-			const prevSnippet = parson.answers.find(an => an.gap.id === answer.gap.id)?.snippet;
-			let nextId = 1000;
-			if(prevSnippet){
-				parson.customSnippets = parson.customSnippets.filter(snip => snip.id !== prevSnippet.id);
-				nextId = prevSnippet.id;
-			}else{
-				parson.customSnippets.forEach(snip => {nextId = snip.id > nextId ? snip.id : nextId;});
-				nextId++;
-			}
-			parson.answers = parson.answers.filter(a => a.gap.id !== answer.gap.id);
-			answer.snippet.id = nextId;
-			parson.customSnippets.push(answer.snippet);
+		if(answer.snippet.id === ""){
+			answer.snippet.id = generateNonce();
+			parson.answers = parson.answers.filter(a => a.gap.id !== answer.gap.id && a.snippet.id !== answer.snippet.id);
 		}else{
 			const otherSnippet = parson.answers.find(an => an.gap.id === answer.gap.id)?.snippet;
 			const otherGap = parson.answers.find(an => an.snippet.id === answer.snippet.id)?.gap;

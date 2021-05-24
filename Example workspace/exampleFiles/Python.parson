@@ -1,0 +1,53 @@
+{
+    "parsonDef": "Python",
+    "answers": [
+        {
+            "gap": {
+                "id": "MTtXCrszZydd",
+                "width": 10,
+                "type": "dropdown",
+                "options": [
+                    "num1",
+                    "num2",
+                    "num3"
+                ]
+            },
+            "snippet": {
+                "text": "num3",
+                "id": "qSlYXrCJENKu"
+            }
+        },
+        {
+            "gap": {
+                "id": "VzHPISHHepiJ",
+                "width": 10,
+                "type": "dropdown",
+                "options": [
+                    "num1",
+                    "num2",
+                    "num3"
+                ]
+            },
+            "snippet": {
+                "text": "num1",
+                "id": "YclyJLgqQZxr"
+            }
+        },
+        {
+            "gap": {
+                "id": "ZyKRWjTKCbnY",
+                "width": 10,
+                "type": "dropdown",
+                "options": [
+                    "num1",
+                    "num2",
+                    "num3"
+                ]
+            },
+            "snippet": {
+                "text": "num3",
+                "id": "QmJwVcJQFzfM"
+            }
+        }
+    ]
+}

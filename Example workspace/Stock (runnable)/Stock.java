@@ -37,6 +37,17 @@ public class Stock {
             "type": "dragdrop"
         }*/
     }
+
+    @Override
+    /*$parson{
+        "text": "@Override",
+        "width": 22,
+        "type": "dropdown",
+        "dropdown": "annotation"
+    }*/
+    public void String toString() {
+        return this.ticker+": "+this.price;
+    }
     
     protected void firePriceChanged(double oldPrice) {
         for (StockListener listener : listeners) {

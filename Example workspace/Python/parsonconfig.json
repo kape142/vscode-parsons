@@ -1,0 +1,11 @@
+{
+    "output": {
+        "parson": "exampleFiles",
+        "parsondef": ".parson",
+        "code": "dist"
+    },
+    "name": "Python",
+    "includesSolution": false,
+    "runnable": false,
+    "entryPoint": ""
+}

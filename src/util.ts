@@ -1,10 +1,12 @@
-import { Exercise, ExerciseFile, Gap, Snippet, ExerciseAnswer, SavedExerciseAnswer} from "./model";
-
+import { CompiledGap, Gap, UncompiledGap } from "./GapSupport/GapModel";
+import { javaCommentParser } from "./LanguageSupport/Languages/Java";
+import { pythonCommentParser } from "./LanguageSupport/Languages/Python";
+import { Exercise, ExerciseFile, Snippet, ExerciseAnswer } from "./model";
 
 export let nonce = generateNonce(32);
 
 
-export function generateNonce(length: number){
+export function generateNonce(length: number = 12){
     let n = "";
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     for (let i = 0; i < length; i++) {
@@ -77,7 +79,7 @@ export function verifySnippet(snippet: Snippet){
     }
 }
 
-export function verifyGap(gap: Gap){
+export function verifyGap(gap: CompiledGap){
     try{
         if(gap === undefined){
             throw new Error("Gap object is not defined");
@@ -137,10 +139,31 @@ interface StringOptions{
 export enum MessageTypes{
     log,
     message,
-    
 }
-
 
 export interface ElementMap{
     [key: number]: HTMLElement;
+}
+
+export interface GapExtraction{
+    gaps: Array<Gap>
+    text: string
+}
+
+export function textToNewSnippet(text: string): Snippet{
+    return {
+        text,
+        id: generateNonce()
+    };
+}
+
+export function extractSnippetsFromGap(gap: UncompiledGap): Array<Snippet>{
+    const snippets = [{
+        text: gap.text,
+        id: generateNonce()
+    }];
+    if(gap.options){
+        snippets.push(...gap.options.map(textToNewSnippet));
+    }
+    return snippets;
 }

@@ -1,12 +1,15 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import { Exercise, SavedExerciseAnswer, Gap, GapDirectory, SnippetDirectory, ParsonConfig, DisposableWrapper } from '../model';
+import { Exercise, SavedExerciseAnswer, GapDirectory, SnippetDirectory, ParsonConfig, DisposableWrapper, Snippet } from '../model';
 import { fileExists, getCodeFilesInFolder, readFile, verifyFolder } from './FileReader';
-import { generateNonce } from '../util';
-import { ExerciseFile, ParsonExplorer } from './ParsonExplorer';
+import { ParsonExplorer } from './ParsonExplorer';
 import { ParsonViewerProvider } from './ParsonViewerProvider';
 import { ParsonDecorationProvider } from './ParsonDecorationProvider';
+import { CodeFile } from './CodeFile';
+import { compileGap, compileGaps } from '../GapSupport/GapTypeHelper';
+import { getGapFromComment } from '../LanguageSupport/LanguageHelper';
+import { CompiledGap, UncompiledGap } from '../GapSupport/GapModel';
 
 export class AdminTools{
     public static register(
@@ -63,20 +66,7 @@ export class AdminTools{
 
     private updateFolder(folderPath: string){
         console.log("updateFolder", folderPath);
-        this.createSnippetsFile(folderPath);
         this.createParsonConfig(folderPath);
-    }
-
-    private createSnippetsFile(folderPath: string){
-        const fileName = path.join(path.join(folderPath, "snippets.json"));
-        if(!fileExists(fileName)){
-            const snippets: SnippetDirectory = {
-                dragdrop: ["example"],
-                dropdown: {list: ["foo", "bar"]}
-            };
-            const snippetString = JSON.stringify(snippets, null, 4);
-            fs.writeFile(fileName, snippetString, (err)=> {throw err;});
-        }
     }
 
     private createParsonConfig(folderPath: string){
@@ -94,7 +84,7 @@ export class AdminTools{
                 entryPoint: ""
             };
             const parsonConfigString = JSON.stringify(parsonConfig, null, 4);
-            fs.writeFile(fileName, parsonConfigString, (err)=> {throw err;});
+            fs.writeFile(fileName, parsonConfigString, (err)=> {if(err){throw err;}});
         }
     }
 
@@ -104,20 +94,66 @@ export class AdminTools{
         const document = vscode.window.activeTextEditor.document;
         const filePath = document.fileName;
         const folderPath = path.dirname(filePath);
-        const codeFiles = getCodeFilesInFolder(folderPath);
+        const filenames = getCodeFilesInFolder(folderPath);
         const gaps: GapDirectory = {};
-        const files: {[key: string]: string} = {};
-        //console.log(codeFiles);
 
         const parsonConfig = readFile<ParsonConfig>(path.join(folderPath, "parsonconfig.json"));
-        const snippets = readFile<SnippetDirectory>(path.join(folderPath, "snippets.json"));
+        const snippets: Array<Snippet> = [];
 
-        codeFiles.forEach(filename => {
-            const extracted = this.extractAndConvertGaps(fs.readFileSync(path.join(folderPath, filename), 'utf-8'), snippets);
-            gaps[filename] = extracted.gaps;
-            files[filename] = extracted.codeFile;
+        const files = filenames.map(filename => new CodeFile(fs.readFileSync(path.join(folderPath, filename), 'utf-8'), filename));
+        const lineMaps = files.map(file => {
+            return {
+                map: file.findCommentsAndLines(),
+                codeFile: file
+            };
         });
-        
+        const lineLists = lineMaps.map(lineMap => {
+            return {
+                list: Array.from(lineMap.map.keys())
+                    .map(line => {
+                        const comments = lineMap.map.get(line)!;
+                        return {
+                            lineText: line.text,
+                            lineNumber: line.lineNumber,
+                            comments,
+                            gaps: comments.map(getGapFromComment)
+                        };
+                    }),
+                codeFile: lineMap.codeFile
+            };
+        });
+
+        const uncompiledGaps: Array<UncompiledGap> = lineLists  
+            .map(lineList => lineList.list
+                .map(line => line.gaps)
+                .reduce((acc, cur) => acc.concat(cur), [])
+            )
+            .reduce((acc, cur) => acc.concat(cur), []);
+
+        lineLists.forEach(lineList => {
+            const fileGaps: Array<CompiledGap> = [];
+            lineList.list.forEach(line => {
+                const replacements: Array<{id: string, text: string, startIndex?: number}> = [];
+                line.gaps.forEach(gap => {
+                    const compiledGap = compileGap(gap, uncompiledGaps);
+                    fileGaps.push(compiledGap.gap);
+                    if(compiledGap.snippets){
+                        snippets.push(...compiledGap.snippets);
+                    }
+                    replacements.push({text: gap.text, id: compiledGap.gap.id, startIndex: gap.startIndex});
+                });
+                lineList.codeFile.removeAnswersFromLine(line.lineNumber, replacements);
+            });
+            gaps[lineList.codeFile.filename] = fileGaps;
+        });
+
+        lineLists.forEach(lineList => {
+            lineList.list.forEach(line => {
+                line.comments.forEach(comment => {
+                    lineList.codeFile.removeText(comment);
+                });
+            });
+        });
         
         if(!parsonConfig.filename){
             parsonConfig.filename = parsonConfig.name;
@@ -125,14 +161,14 @@ export class AdminTools{
 
         const parsondef: Exercise = {
             name: parsonConfig.name,
-            files: Object.keys(gaps).map(fileName => {
+            files: files.map(file => {
                 return {
-                    name: fileName,
-                    text: files[fileName],
-                    gaps: gaps[fileName]
+                    name: file.filename,
+                    text: file.text,
+                    gaps: gaps[file.filename]
                 };
             }),
-            snippets: snippets.dragdrop.map((snip, i) => {return {text: snip, id: i};}),
+            snippets: snippets,
             runnable: parsonConfig.runnable,
             output: parsonConfig.output.code,
             entryPoint: parsonConfig.entryPoint
@@ -161,80 +197,66 @@ export class AdminTools{
         }
     }
 
+    private extractAndConvertGaps(text: string, filename: string): {codeFile: string, gaps: Array<CompiledGap>, snippets: Array<Snippet>}{
+        const gaps: Array<CompiledGap> = [];
+        const snippets: Array<Snippet> = [];
+        const codeFile = new CodeFile(text, filename);
+        const lineMap = codeFile.findCommentsAndLines();
+        const lines = Array.from(lineMap.keys())
+            .map(line => {
+                const comments = lineMap.get(line)!;
+                return {
+                    lineText: line.text,
+                    lineNumber: line.lineNumber,
+                    comments,
+                    gaps: comments.map(getGapFromComment)
+                };
+            });
+        
+        const uncompiledGaps: Array<UncompiledGap> = lines
+            .map(line => line.gaps)
+            .reduce((acc, cur) => acc.concat(cur), []);
+
+        lines.forEach(line => {
+            const replacements: Array<{id: string, text: string, startIndex?: number}> = [];
+            line.gaps.forEach(gap => {
+                const compiledGap = compileGap(gap, uncompiledGaps);
+                gaps.push(compiledGap.gap);
+                if(compiledGap.snippets){
+                    snippets.push(...compiledGap.snippets);
+                }
+                replacements.push({text: gap.text, id: compiledGap.gap.id, startIndex: gap.startIndex});
+            });
+            codeFile.removeAnswersFromLine(line.lineNumber, replacements);
+        });
+
+        lines.forEach(line => {
+            line.comments.forEach(comment => {
+                codeFile.removeText(comment);
+            });
+        });
+        return {codeFile: codeFile.text, gaps, snippets};
+    }
+
     private createGap(){
+        console.log("createGap");
         if(vscode.window.activeTextEditor){
             const selection = vscode.window.activeTextEditor?.selection;
             const document = vscode.window.activeTextEditor.document;
             const documentText = document.getText();
             const selectionText = document.getText(selection);
-            const restOfText = document.getText().substring(document.offsetAt(selection.end));
-            //console.log(selectionText, "\nrest: ", restOfText);
-            const regexp = new RegExp("(\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/)+", "s",);
-            const gapsForLine = restOfText.match(regexp);
-            let writePos = new vscode.Position(selection.end.line+1, 0);
-            if(gapsForLine?.[0] && writePos.line === document.positionAt(documentText.indexOf(gapsForLine[0])).line+1){
-                const gapsForLineOffset = document.getText().indexOf(gapsForLine[0])+gapsForLine[0].length;
-                const endPos = document.positionAt(gapsForLineOffset);
-                writePos = new vscode.Position(endPos.line+1, 0);
-            }
-            const startOfLine = document.getText(new vscode.Range(new vscode.Position(selection.start.line,0), selection.end));
-            const indentationIsTab = startOfLine.charAt(0) === "\t";
-            //console.log("indentation:"+startOfLine.charAt(0)+"stop", indentationIsTab);
-            const indentations = (startOfLine.length - startOfLine.trim().length) / (indentationIsTab ? 1 : 4);
-            //console.log(indentations, startOfLine.length, startOfLine.trim().length);
-            let gapText = `${this.indent(indentations)}/*$parson{\n`+
-                `${this.indent(indentations+1)}"text": "${selectionText.replace('"', '\\"')}",\n`+
-                `${this.indent(indentations+1)}"width": ${selectionText.length*2},\n`+
-                `${this.indent(indentations+1)}"type": "dragdrop"\n`+
-                `${this.indent(indentations)}}*/\n`;
-            //console.log(gapText);
-            let snippetUri = path.join(path.dirname(document.fileName), "snippets.json");
-            //console.log(snippetUri, document.uri);
-            vscode.workspace.openTextDocument(snippetUri).then(snipDoc => {
-                let snippets = JSON.parse(snipDoc.getText()) as SnippetDirectory;
-                snippets.dragdrop.push(selectionText);
-                const edit = new vscode.WorkspaceEdit();
-                edit.insert(document.uri, writePos, gapText);
-                edit.replace(snipDoc.uri, new vscode.Range(0,0,snipDoc.lineCount, 0), JSON.stringify(snippets, null, 4),);
-                vscode.workspace.applyEdit(edit);
-            });
-            
+            const codeFile = new CodeFile(documentText, document.fileName);
+            let gap: UncompiledGap = {
+                text: selectionText.replace('"', '\\"'),
+                width: selectionText.length * 2,
+                type: "dragdrop",
+                options: ["example"]
+            };
+            const gapComment = codeFile.createGapComment(gap, selection.end.line);
+            const edit = new vscode.WorkspaceEdit();
+            edit.insert(document.uri, gapComment.writePos, gapComment.text);
+            vscode.workspace.applyEdit(edit);
         }
-    }
-
-    indent(ind: number): string{
-        let str = "";
-        for(let i = 0; i < ind; i++){
-            str+="    ";
-        }
-        //console.log("str", str);
-        return str;
-    }
-    
-
-    private extractAndConvertGaps(codeFile: string, snippets: SnippetDirectory): {codeFile: string, gaps: Array<Gap>}{
-        const gaps: Array<Gap> = [];
-        const regexp = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",);
-        const extraction = codeFile.match(regexp);
-        let updatedCodeFile = codeFile.slice();
-        //console.log(extraction);
-        if(extraction){
-            for(const comment of extraction){
-                const jsonString = comment.substring(comment.indexOf("{"), comment.lastIndexOf("}")+1);
-                const gap: Gap = JSON.parse(jsonString);
-                const nonce = generateNonce(12);
-                gap.id = nonce;
-                if(gap.type === "dropdown"){
-                    gap.options = snippets.dropdown[gap.dropdown!];
-                }
-                const newJsonString = JSON.stringify({id: nonce, text: gap.text});
-                updatedCodeFile = updatedCodeFile.replace(jsonString, newJsonString);
-                gaps.push({id: nonce, type: gap.type, width: gap.width, options: gap.options});
-            }
-        }
-        //console.log(updatedCodeFile);
-        //console.log(gaps);
-        return {codeFile: updatedCodeFile, gaps};
     }
 
     private refreshEntries(){

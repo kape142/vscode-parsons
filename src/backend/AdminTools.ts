@@ -178,7 +178,7 @@ export class AdminTools{
         };
 
         const parson: SavedExerciseAnswer = {
-            parsonDef: parsonConfig.filename,
+            parsonDef: path.join(parsonConfig.output.parsondef,parsonConfig.filename),
             answers: []
         };
         const workspaceFolder = vscode.workspace.workspaceFolders!![0].uri.fsPath;

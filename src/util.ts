@@ -165,5 +165,5 @@ export function extractSnippetsFromGap(gap: UncompiledGap): Array<Snippet>{
     if(gap.options){
         snippets.push(...gap.options.map(textToNewSnippet));
     }
-    return snippets;
+    return snippets.sort((a,b)=> a.id.localeCompare(b.id));
 }

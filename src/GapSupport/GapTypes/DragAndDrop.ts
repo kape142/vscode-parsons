@@ -8,6 +8,7 @@ export const dragDrop: GapType = {
             throw new Error(`Gap of type "${gap.type}" sent to DragDropCompiler`);
         }
         const snippets = extractSnippetsFromGap(gap);
+        console.log(snippets);
         return {
             gap: {
                 id: generateNonce(),

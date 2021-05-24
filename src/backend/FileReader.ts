@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import {accessSync, constants, readFileSync, readdirSync, mkdirSync} from 'fs';
+import {accessSync, constants, readFileSync, readdirSync, mkdirSync, lstatSync} from 'fs';
 import {SavedExerciseAnswer, ExerciseAnswer, Exercise, ExerciseFile} from '../model';
 import { workspace } from 'vscode';
 /* TODO:
@@ -30,7 +30,7 @@ export function readParsonFile(filename: string, workspaceroot: string): Exercis
 
 export function loadExercises(parson: SavedExerciseAnswer, workspaceroot: string): ExerciseAnswer{
     if(typeof parson.parsonDef === "string"){
-        const filename = path.join(workspaceroot, '.parson', `${parson.parsonDef}.parsondef`);
+        const filename = path.join(workspaceroot, `${parson.parsonDef}.parsondef`);
         if(fileExists(filename)){
             const fileRead = readFileSync(filename, 'utf-8');
             //console.log("read:", fileRead);
@@ -49,7 +49,7 @@ export function loadExercises(parson: SavedExerciseAnswer, workspaceroot: string
 export function loadExercisesToString(text: string, workspaceroot: string): string{
     const parsed: SavedExerciseAnswer = JSON.parse(text);
     if(typeof parsed.parsonDef === "string"){
-        const filename = path.join(workspaceroot, '.parson', `${parsed.parsonDef}.parsondef`);
+        const filename = path.join(workspaceroot, `${parsed.parsonDef}.parsondef`);
         if(fileExists(filename)){
             const fileRead = readFileSync(filename, 'utf-8');
             //console.log("read:", fileRead);
@@ -72,13 +72,19 @@ export function getParsonFilesInFolder(filePath: string, previousPath?: string):
     if(fileExists(filePath)){
         const files = readdirSync(filePath);
         const subFolderFiles = files
-            .filter(folderFilter)
-            .map(folder => getParsonFilesInFolder(path.join(filePath, folder), previousPath ? path.join(previousPath, folder) : folder))
+            .filter(file => folderFilter(file, filePath))
+            .map(folder => getParsonFilesInFolder(path.join(filePath, folder), folder))
             .reduce((acc, cur) => {cur.forEach(el => acc.push(el)); return acc;}, []);
         let a = files
             .filter(file => file.includes(".parson") && file !== ".parson")
             .concat(subFolderFiles)
-            .map(filename => previousPath? path.join(previousPath, filename) : filename);
+            .map(filename => {
+                console.log(files);
+                console.log(filename);
+                console.log(filePath);
+                console.log(previousPath);
+                return previousPath? path.join(previousPath, filename) : filename;}
+                );
         //console.log(filePath, previousPath, files, subFolderFiles, a);
         return a;
     }
@@ -93,8 +99,8 @@ export function getCodeFilesInFolder(filePath: string): string[]{
     return [];
 }
 
-function folderFilter(file: string): boolean{
-    return !file.includes(".") && file !== "node_modules" && file !== "dist" && file !== "out" && file !== ".parson";
+function folderFilter(file: string, folderPath: string): boolean{
+    return lstatSync(path.join(folderPath, file)).isDirectory()  && file !== "node_modules" && file !== "dist" && file !== "out" && !file.startsWith(".");
 }
 
 

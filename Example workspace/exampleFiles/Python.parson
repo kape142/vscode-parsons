@@ -1,9 +1,9 @@
 {
-    "parsonDef": "Python",
+    "parsonDef": ".parson\\Python",
     "answers": [
         {
             "gap": {
-                "id": "EeLciRLkBhbI",
+                "id": "OxDWjAsJeWpC",
                 "width": 10,
                 "type": "dropdown",
                 "options": [
@@ -14,12 +14,12 @@
             },
             "snippet": {
                 "text": "num1",
-                "id": "IHvAQRHGaBcd"
+                "id": "ExuzoAkGdxOm"
             }
         },
         {
             "gap": {
-                "id": "UqVquNLQSaNi",
+                "id": "ixnTCnAeJdIJ",
                 "width": 10,
                 "type": "dropdown",
                 "options": [
@@ -30,12 +30,12 @@
             },
             "snippet": {
                 "text": "num2",
-                "id": "aacgvflOaSVH"
+                "id": "XuKFniHmVwOj"
             }
         },
         {
             "gap": {
-                "id": "ujsKEgZgzFYn",
+                "id": "imORiQBhKzvL",
                 "width": 10,
                 "type": "dropdown",
                 "options": [
@@ -46,7 +46,7 @@
             },
             "snippet": {
                 "text": "num3",
-                "id": "zHSgeRUeLWKX"
+                "id": "aoSEwhHouiup"
             }
         }
     ]

@@ -88,7 +88,7 @@ export function getParsonFilesInFolder(filePath: string, previousPath?: string):
 export function getCodeFilesInFolder(filePath: string): string[]{
     if(fileExists(filePath)){
         const files = readdirSync(filePath);
-        return files.filter(file => !file.endsWith(".parson") && file !== "snippets.json" && file !== "parsonconfig.json");
+        return files.filter(file => !file.endsWith(".parson") && file !== "parsonconfig.json");
     }
     return [];
 }

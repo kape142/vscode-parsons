@@ -23,7 +23,10 @@ export class AdminTools{
         let registerGap = vscode.commands.registerCommand('vscodeparsons.registerGap', ()=>adminTools.createGap());
         let refreshEntries = vscode.commands.registerCommand('vscodeparsons.refreshEntries', ()=>adminTools.refreshEntries());
         let refreshEntry = vscode.commands.registerCommand('vscodeparsons.refreshEntry', (exerciseFile)=>adminTools.refreshEntry(exerciseFile));
-        let disposable = vscode.Disposable.from(fileToProblem, folderToProblem, exportFile, registerGap, refreshEntries, refreshEntry);
+        let registerFileSaveListener = adminTools.registerFileSaveListener();
+        let registerRefreshSettingListener = adminTools.registerRefreshSettingListener();
+        let disposable = vscode.Disposable.from(fileToProblem, folderToProblem, exportFile,
+             registerGap, refreshEntries, refreshEntry, registerFileSaveListener, registerRefreshSettingListener);
         return {it: adminTools, disposable};
     }
 
@@ -189,12 +192,8 @@ export class AdminTools{
         console.log("parsondef folder verified");
         fs.writeFileSync(path.join(workspaceFolder, parsonConfig.output.parsondef, `${parsonConfig.filename}.parsondef`),JSON.stringify(parsondef, null, 4));
         console.log("parsondef file created");
-        try{ // bytt til å trye i hver metode
-            this.refreshEntries();
-            this.refreshEntry({uri: parsonFileName, files: parsondef.files.map(file=>file.name)});
-        }catch(error){
-            console.log(error);
-        }
+        this.refreshEntries();
+        this.refreshEntry({uri: parsonFileName, files: parsondef.files.map(file=>file.name)});
     }
 
     private extractAndConvertGaps(text: string, filename: string): {codeFile: string, gaps: Array<CompiledGap>, snippets: Array<Snippet>}{
@@ -260,15 +259,69 @@ export class AdminTools{
     }
 
     private refreshEntries(){
-        this.parsonExplorer.onDidChangeTreeDataEmitter.fire();
+        try{
+            this.parsonExplorer.onDidChangeTreeDataEmitter.fire();
+        }catch(error){
+            if(error){
+                console.log(error);
+            }
+        }
     }
 
     private refreshEntry(exerciseFile: {uri: string, files?: Array<string>}){
-        this.parsonViewerProvider.updateFile(exerciseFile.uri);
-        exerciseFile.files?.forEach(file => {
-            const parsonUri = vscode.Uri.parse(`parson:${path.join(exerciseFile.uri, file)}`);
-            console.log("parsonUri: "+parsonUri.path);
-            this.decorationProvider.fileChangeEmitter.fire(parsonUri);
+        try{
+            this.parsonViewerProvider.updateFile(exerciseFile.uri);
+        }catch(error){
+            if(error){
+                console.log(error);
+            }
+        }
+        try{
+            exerciseFile.files?.forEach(file => {
+                const parsonUri = vscode.Uri.parse(`parson:${path.join(exerciseFile.uri, file)}`);
+                console.log("parsonUri: "+parsonUri.path);
+                this.decorationProvider.fileChangeEmitter.fire(parsonUri);
+            });
+        }catch(error){
+            if(error){
+                console.log(error);
+            }
+        }
+    }
+
+    private registerRefreshSettingListener(){
+        return vscode.workspace.onDidChangeConfiguration((configChange: vscode.ConfigurationChangeEvent) => {
+            if(configChange.affectsConfiguration("vscodeparsons.enableRefreshing")){
+                this.refreshEntries();
+            }
         });
+    }
+
+    private registerFileSaveListener(){
+        let saveDisposable: vscode.Disposable | undefined = this.updateSaveListener();
+        const configDisposable = vscode.workspace.onDidChangeConfiguration((configChange: vscode.ConfigurationChangeEvent) => {
+            if(configChange.affectsConfiguration("vscodeparsons.listenForChanges")){
+                saveDisposable = this.updateSaveListener(saveDisposable);
+            }
+        });
+        return new vscode.Disposable(()=>{
+            saveDisposable?.dispose();
+            configDisposable.dispose();
+        });
+    }
+
+    private updateSaveListener(saveDisposable?: vscode.Disposable): vscode.Disposable | undefined{
+        const settingValue = vscode.workspace.getConfiguration("vscodeparsons").get<boolean>("listenForChanges");
+        if(settingValue){
+            return vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
+                const folder = path.dirname(document.fileName);
+                if(fileExists(path.join(folder, "parsonconfig.json"))){
+                    this.exportFile();
+                }
+            });
+        }else{
+            saveDisposable?.dispose();
+        }
+        
     }
 }

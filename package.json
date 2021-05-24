@@ -26,6 +26,12 @@
 					"scope": "application",
 					"default": false,
 					"description": "Enable refreshing the Parson Explorer and Parson files for development of exercises"
+				},
+				"vscodeparsons.listenForChanges": {
+					"type": "boolean",
+					"scope": "application",
+					"default": false,
+					"description": "Automatically export changes to .parson files whenever a file is saved in a folder which includes a parsonconfig.json"
 				}
 			}
 		},

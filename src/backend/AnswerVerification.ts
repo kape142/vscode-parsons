@@ -12,8 +12,14 @@ export class AnswerVerification{
     public static register(workspaceroot: string): DisposableWrapper<AnswerVerification>{
         let answerVerification = new AnswerVerification(workspaceroot);
         let compileAndRun = vscode.commands.registerCommand('vscodeparsons.compileAndRun', (exerciseFile: ExerciseFile)=>answerVerification.compileAndRun(exerciseFile.uri));
-        let disposable = vscode.Disposable.from(compileAndRun);
+        let disposable = vscode.Disposable.from(compileAndRun, answerVerification);
         return {it: answerVerification, disposable};
+    }
+
+    public dispose(){
+        if(this.terminal){
+            this.terminal.dispose();
+        }
     }
 
     constructor(private workspaceroot: string){
@@ -27,7 +33,37 @@ export class AnswerVerification{
             answerMap[answer.gap.id] = answer.snippet.text;
         });
         console.log(parson);
-        const gapFinder = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",); // TODO needs to handle comment blocks simultaneously
+        parson.exercise.files.forEach(file => {
+            file.gaps.forEach(gap => {
+                file.text = file.text.replace(gap.id, answerMap[gap.id]);
+            });
+            const folderPath = path.join(this.workspaceroot, parson.exercise.output!);
+            console.log(folderPath, file.name);
+            verifyFolder(folderPath);
+            fs.writeFileSync(path.join(folderPath, file.name), file.text);
+        });
+        if(parson.exercise.runCommands){
+            if(!this.terminal || this.terminal.exitStatus){
+                const terminalName = `Parson Terminal #${this.nextTerminalId++}`;
+                this.terminal = vscode.window.createTerminal(terminalName);
+            }else{
+                this.terminal.sendText(`cd "${this.workspaceroot}"`);
+                this.terminal.sendText("clear");
+            }
+            this.terminal.show();
+            parson.exercise.runCommands.forEach(command => {
+                if(command.startsWith("parson-compile:")){
+                    this.compileAndRun(command.substring("parson-compile:".length));
+                }else{
+                    this.terminal?.sendText(command);
+                }
+            });
+        }
+    }
+}
+
+/* 
+const gapFinder = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",); // TODO needs to handle comment blocks simultaneously
         parson.exercise.files.forEach(file => {
             console.log(file);
             const extraction = file.text.match(gapFinder);
@@ -56,21 +92,4 @@ export class AnswerVerification{
                 });
             }
             console.log("runnable:\n"+file.text);
-            const folderPath = path.join(this.workspaceroot, parson.exercise.output!);
-            console.log(folderPath, file.name);
-            verifyFolder(folderPath);
-            fs.writeFileSync(path.join(folderPath, file.name), file.text);
-        });
-        if(!this.terminal || this.terminal.exitStatus){
-            const terminalName = `Parson Terminal #${this.nextTerminalId++}`;
-            this.terminal =  vscode.window.createTerminal(terminalName);
-            this.terminal.sendText(`echo '${terminalName} created'`);
-            this.terminal.sendText(`cd ${parson.exercise.output}`);
-        }
-        this.terminal.sendText(`rm *.class`);
-        this.terminal.sendText("clear");
-        this.terminal.show();
-        this.terminal.sendText(`javac *.java`);
-        this.terminal.sendText(`java ${parson.exercise.entryPoint}`);
-    }
-}
+*/

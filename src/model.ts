@@ -5,9 +5,9 @@ export interface Exercise{
     name: string
     snippets: Array<Snippet>
     files: Array<ExerciseFile>
-    runnable?: boolean,
+    runnable: boolean,
     output?: string,
-    entryPoint?: string
+    runCommands?: Array<string>
 }
 
 export interface ExerciseFile{
@@ -51,9 +51,9 @@ export interface ParsonConfig{
     }
     name: string
     filename?: string
-    includesSolution?: boolean,
-    runnable?: boolean,
-    entryPoint?: string
+    includesSolution: boolean,
+    runnable: boolean,
+    runCommands?: Array<string>
 }
 
 export interface GapDirectory{

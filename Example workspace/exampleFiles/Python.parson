@@ -3,23 +3,7 @@
     "answers": [
         {
             "gap": {
-                "id": "MTtXCrszZydd",
-                "width": 10,
-                "type": "dropdown",
-                "options": [
-                    "num1",
-                    "num2",
-                    "num3"
-                ]
-            },
-            "snippet": {
-                "text": "num3",
-                "id": "qSlYXrCJENKu"
-            }
-        },
-        {
-            "gap": {
-                "id": "VzHPISHHepiJ",
+                "id": "EeLciRLkBhbI",
                 "width": 10,
                 "type": "dropdown",
                 "options": [
@@ -30,12 +14,28 @@
             },
             "snippet": {
                 "text": "num1",
-                "id": "YclyJLgqQZxr"
+                "id": "IHvAQRHGaBcd"
             }
         },
         {
             "gap": {
-                "id": "ZyKRWjTKCbnY",
+                "id": "UqVquNLQSaNi",
+                "width": 10,
+                "type": "dropdown",
+                "options": [
+                    "num1",
+                    "num2",
+                    "num3"
+                ]
+            },
+            "snippet": {
+                "text": "num2",
+                "id": "aacgvflOaSVH"
+            }
+        },
+        {
+            "gap": {
+                "id": "ujsKEgZgzFYn",
                 "width": 10,
                 "type": "dropdown",
                 "options": [
@@ -46,7 +46,7 @@
             },
             "snippet": {
                 "text": "num3",
-                "id": "QmJwVcJQFzfM"
+                "id": "zHSgeRUeLWKX"
             }
         }
     ]

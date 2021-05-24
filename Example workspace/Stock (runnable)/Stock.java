@@ -45,7 +45,7 @@ public class Stock {
         "type": "dropdown",
         "dropdown": "annotation"
     }*/
-    public void String toString() {
+    public String toString() {
         return this.ticker+": "+this.price;
     }
     

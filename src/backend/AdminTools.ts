@@ -84,7 +84,7 @@ export class AdminTools{
                 name: path.basename(folderPath),
                 includesSolution: false,
                 runnable: false,
-                entryPoint: ""
+                runCommands: ["cd dist", "javac *.java", "java Main"]
             };
             const parsonConfigString = JSON.stringify(parsonConfig, null, 4);
             fs.writeFile(fileName, parsonConfigString, (err)=> {if(err){throw err;}});
@@ -174,7 +174,7 @@ export class AdminTools{
             snippets: snippets,
             runnable: parsonConfig.runnable,
             output: parsonConfig.output.code,
-            entryPoint: parsonConfig.entryPoint
+            runCommands: parsonConfig.runCommands
         };
 
         const parson: SavedExerciseAnswer = {

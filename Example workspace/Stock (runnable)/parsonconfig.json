@@ -2,10 +2,16 @@
     "output": {
         "parson": "exampleFiles",
         "parsondef": ".parson",
-        "code": "dist"
+        "code": "dist/Stock"
     },
     "name": "Øving 6 - Stock",
     "includesSolution": false,
     "runnable": true,
-    "entryPoint": "StockIndex"
+    "runCommands": [
+        "cd dist/Stock",
+        "rm *.class",
+        "clear",
+        "javac *.java",
+        "java StockIndex"
+    ]
 }

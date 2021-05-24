@@ -2,10 +2,13 @@
     "output": {
         "parson": "exampleFiles",
         "parsondef": ".parson",
-        "code": "dist"
+        "code": "dist/python"
     },
     "name": "Python",
     "includesSolution": false,
-    "runnable": false,
-    "entryPoint": ""
+    "runnable": true,
+    "runCommands": [
+        "cd dist/python",
+        "python test.py"
+    ]
 }

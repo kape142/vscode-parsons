@@ -1,6 +1,7 @@
 import { Answer, Snippet } from "../../model";
-import { extractSnippetsFromGap, generateNonce, textToNewSnippet } from "../../util";
+import { extractSnippetsFromGap, generateNonce } from "../../util";
 import { CompiledGap, GapType, UncompiledGap } from "../GapModel";
+import "./Dropdown.less";
 
 export const dropdown: GapType = {
     compile(gap: UncompiledGap, gapList: Array<UncompiledGap>){

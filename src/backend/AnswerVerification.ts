@@ -1,10 +1,9 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import { Answer, DisposableWrapper } from '../model';
+import { DisposableWrapper } from '../model';
 import { ExerciseFile } from './ParsonExplorer';
 import { readParsonFile, verifyFolder } from './FileReader';
-import { replaceMostRecent } from '../util';
 
 export class AnswerVerification{
     private terminal?: vscode.Terminal;
@@ -22,9 +21,7 @@ export class AnswerVerification{
         }
     }
 
-    constructor(private workspaceroot: string){
-
-    }
+    constructor(private workspaceroot: string){}
 
     compileAndRun(filePath: string){
         const parson = readParsonFile(filePath, this.workspaceroot);
@@ -32,13 +29,11 @@ export class AnswerVerification{
         parson.answers.forEach(answer => {
             answerMap[answer.gap.id] = answer.snippet.text;
         });
-        console.log(parson);
         parson.exercise.files.forEach(file => {
             file.gaps.forEach(gap => {
                 file.text = file.text.replace(gap.id, answerMap[gap.id]);
             });
             const folderPath = path.join(this.workspaceroot, parson.exercise.output!);
-            console.log(folderPath, file.name);
             verifyFolder(folderPath);
             fs.writeFileSync(path.join(folderPath, file.name), file.text);
         });
@@ -61,35 +56,3 @@ export class AnswerVerification{
         }
     }
 }
-
-/* 
-const gapFinder = new RegExp("\\s*\\/\\*\\s*\\$parson\\s*\\{.+?\\}\\s*\\*\\/", "gs",); // TODO needs to handle comment blocks simultaneously
-        parson.exercise.files.forEach(file => {
-            console.log(file);
-            const extraction = file.text.match(gapFinder);
-            if(extraction){
-                extraction
-                    .reverse()
-                    .map(comment => {
-                        return {
-                            jsonString: comment.substring(comment.indexOf("{"), comment.lastIndexOf("}")+1),
-                            index: file.text.indexOf(comment)
-                        };})
-                    .map(data => {
-                        return {
-                            gap: JSON.parse(data.jsonString) as {id: string, text: string},
-                            index: data.index
-                        };})
-                    .forEach(data => {
-                        file.text = replaceMostRecent(file.text, data.gap.text!, data.gap.id, data.index);
-                    });
-                extraction.forEach(comment => {
-                    const index = file.text.indexOf(comment);
-                    file.text = file.text.slice(0, index)+file.text.slice(index+comment.length);
-                });
-                file.gaps.forEach(gap=>{
-                    file.text = file.text.replace(gap.id, answerMap[gap.id] || "");
-                });
-            }
-            console.log("runnable:\n"+file.text);
-*/

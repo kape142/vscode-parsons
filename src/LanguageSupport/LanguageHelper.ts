@@ -10,17 +10,13 @@ export function findCommentsAndLines(text: string, regexBlockCommentStart: strin
     const lineComments = text.match(multiRegexp);
     const map = new Map<CodeLine, Array<string>>();
     const lines = text.split("\n");
-    console.log(lines);
     for(const lineComment of lineComments || []){
         const line = text.substring(0, text.indexOf(lineComment)).split("\n").length-1;
-        //console.log(line);
-        //console.log(lines[line]);
         const comments = lineComment.match(singleRegexp);
         if(comments){
             map.set({text: lines[line], lineNumber: line}, comments);
         }
     }
-    console.log(map);
     return map;
 }
 

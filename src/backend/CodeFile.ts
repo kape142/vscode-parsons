@@ -29,7 +29,7 @@ export class CodeFile{
         if(index > 0){
             this.text = this.text.slice(0, index)+this.text.slice(index+text.length);
         }else{
-            console.log(this.text, text, index);
+            throw new Error(`text: \n${text}\n could not be found in file ${this.filename}`);
         }
     }
 
@@ -72,11 +72,9 @@ export class CodeFile{
 
     createGapComment(gap: Gap, lineNumber: number): {text: string, writePos: vscode.Position}{
         const line = this.getLines()[lineNumber];
-        console.log(line);
         const indentations = (line.indexOf(line.trim())) / this.indentation.length;
         const newComment = this.gapParser.createComment(gap, indentations, this.indentation);
         const comments = this.findCommentsAndLines().get({text: line, lineNumber});
-        console.log(comments);
         let writePos = new vscode.Position(lineNumber+1, 0);
         if(comments){
             const lastComment = comments
@@ -114,7 +112,7 @@ export class CodeFile{
                 }
             }
         });
-        const foundIndentation = indents.lastIndexOf(indentedLines);
+        const foundIndentation = indents.lastIndexOf(indentedLines); //does not handle even a single line of non-standard indentation
         return symbol.repeat(foundIndentation > 0 ? foundIndentation : (symbol === " ")? 4 : 1);
     }
 }

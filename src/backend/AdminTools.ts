@@ -1,13 +1,13 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import { Exercise, SavedExerciseAnswer, GapDirectory, SnippetDirectory, ParsonConfig, DisposableWrapper, Snippet } from '../model';
+import { Exercise, SavedExerciseAnswer, GapDirectory, ParsonConfig, DisposableWrapper, Snippet } from '../model';
 import { fileExists, getCodeFilesInFolder, readFile, verifyFolder } from './FileReader';
 import { ParsonExplorer } from './ParsonExplorer';
 import { ParsonViewerProvider } from './ParsonViewerProvider';
 import { ParsonDecorationProvider } from './ParsonDecorationProvider';
 import { CodeFile } from './CodeFile';
-import { compileGap, compileGaps } from '../GapSupport/GapTypeHelper';
+import { compileGap } from '../GapSupport/GapTypeHelper';
 import { getGapFromComment } from '../LanguageSupport/LanguageHelper';
 import { CompiledGap, UncompiledGap } from '../GapSupport/GapModel';
 
@@ -46,7 +46,6 @@ export class AdminTools{
         if(fileNameNoExt.trim() === ""){return;}
         const folderPath = path.join(path.dirname(filePath), fileNameNoExt);
         fs.mkdirSync(folderPath);
-        //console.log(filePath, path.join(folderPath, fileName));
         const newFilePath = path.join(folderPath, fileName);
         fs.copyFileSync(filePath, newFilePath);
         vscode.commands.executeCommand('workbench.action.closeActiveEditor');
@@ -54,7 +53,6 @@ export class AdminTools{
             vscode.window.showTextDocument(doc);
           });
         fs.unlinkSync(filePath);
-        //console.log("unlinked");
         this.updateFolder(folderPath);
     }
 
@@ -63,12 +61,10 @@ export class AdminTools{
         const document = vscode.window.activeTextEditor.document;
         const filePath = document.fileName;
         const folderPath = path.dirname(filePath);
-        console.log(filePath, folderPath);
         this.updateFolder(folderPath);
     }
 
     private updateFolder(folderPath: string){
-        console.log("updateFolder", folderPath);
         this.createParsonConfig(folderPath);
     }
 
@@ -92,7 +88,6 @@ export class AdminTools{
     }
 
     private exportFile(){
-        console.log("export");
         if(!vscode.window.activeTextEditor){return;}
         const document = vscode.window.activeTextEditor.document;
         const filePath = document.fileName;
@@ -182,63 +177,16 @@ export class AdminTools{
             answers: []
         };
         const workspaceFolder = vscode.workspace.workspaceFolders!![0].uri.fsPath;
-        console.log(parson, parsondef, workspaceFolder, path.join(workspaceFolder, parsonConfig.output.parson, `${parsonConfig.filename}.parson`));
         verifyFolder(path.join(workspaceFolder, parsonConfig.output.parson));
-        console.log("parson folder verified");
         const parsonFileName = path.join(parsonConfig.output.parson, `${parsonConfig.filename}.parson`);
         fs.writeFileSync(path.join(workspaceFolder, parsonFileName),JSON.stringify(parson, null, 4));
-        console.log("parson file created");
         verifyFolder(path.join(workspaceFolder, parsonConfig.output.parsondef));
-        console.log("parsondef folder verified");
         fs.writeFileSync(path.join(workspaceFolder, parsonConfig.output.parsondef, `${parsonConfig.filename}.parsondef`),JSON.stringify(parsondef, null, 4));
-        console.log("parsondef file created");
         this.refreshEntries();
         this.refreshEntry({uri: parsonFileName, files: parsondef.files.map(file=>file.name)});
     }
 
-    private extractAndConvertGaps(text: string, filename: string): {codeFile: string, gaps: Array<CompiledGap>, snippets: Array<Snippet>}{
-        const gaps: Array<CompiledGap> = [];
-        const snippets: Array<Snippet> = [];
-        const codeFile = new CodeFile(text, filename);
-        const lineMap = codeFile.findCommentsAndLines();
-        const lines = Array.from(lineMap.keys())
-            .map(line => {
-                const comments = lineMap.get(line)!;
-                return {
-                    lineText: line.text,
-                    lineNumber: line.lineNumber,
-                    comments,
-                    gaps: comments.map(getGapFromComment)
-                };
-            });
-        
-        const uncompiledGaps: Array<UncompiledGap> = lines
-            .map(line => line.gaps)
-            .reduce((acc, cur) => acc.concat(cur), []);
-
-        lines.forEach(line => {
-            const replacements: Array<{id: string, text: string, startIndex?: number}> = [];
-            line.gaps.forEach(gap => {
-                const compiledGap = compileGap(gap, uncompiledGaps);
-                gaps.push(compiledGap.gap);
-                if(compiledGap.snippets){
-                    snippets.push(...compiledGap.snippets);
-                }
-                replacements.push({text: gap.text, id: compiledGap.gap.id, startIndex: gap.startIndex});
-            });
-            codeFile.removeAnswersFromLine(line.lineNumber, replacements);
-        });
-
-        lines.forEach(line => {
-            line.comments.forEach(comment => {
-                codeFile.removeText(comment);
-            });
-        });
-        return {codeFile: codeFile.text, gaps, snippets};
-    }
-
     private createGap(){
-        console.log("createGap");
         if(vscode.window.activeTextEditor){
             const selection = vscode.window.activeTextEditor?.selection;
             const document = vscode.window.activeTextEditor.document;
@@ -279,7 +227,6 @@ export class AdminTools{
         try{
             exerciseFile.files?.forEach(file => {
                 const parsonUri = vscode.Uri.parse(`parson:${path.join(exerciseFile.uri, file)}`);
-                console.log("parsonUri: "+parsonUri.path);
                 this.decorationProvider.fileChangeEmitter.fire(parsonUri);
             });
         }catch(error){

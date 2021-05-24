@@ -1,6 +1,4 @@
 import { CompiledGap, Gap, UncompiledGap } from "./GapSupport/GapModel";
-import { javaCommentParser } from "./LanguageSupport/Languages/Java";
-import { pythonCommentParser } from "./LanguageSupport/Languages/Python";
 import { Exercise, ExerciseFile, Snippet, ExerciseAnswer } from "./model";
 
 export let nonce = generateNonce(32);
@@ -28,6 +26,8 @@ export function parseExerciseAnswer(text: string): ExerciseAnswer{
 /* TODO:
  * Validate that all gap ids are unique
  * Validate that all gap ids are present in the code and vice versa
+ * Update with model changes
+ * Use more often
  */
 export function parseExercise(text: string): Exercise{
     const parsed: Exercise = JSON.parse(text);
@@ -111,43 +111,9 @@ export function verifyString(string: string, details: string, options: StringOpt
     }
 }
 
-export function replaceMostRecent(text: string, searchValue: string, replaceValue: string, startIndex: number): string{
-    console.log("replaceMostRecent:");
-    console.log(text);
-    console.log(searchValue);
-    console.log(replaceValue);
-    console.log(startIndex);
-    
-    let lastIndex = text.indexOf(searchValue);
-    while(lastIndex >= 0 && lastIndex < startIndex){
-        const index = text.indexOf(searchValue, lastIndex+1);
-        if(index < startIndex && index >= 0){
-            lastIndex = index;
-        }else{
-            break;
-        }
-    }
-    const newText = text.substring(0, lastIndex) + replaceValue + text.substring(lastIndex+searchValue.length);
-    return newText;
-}
-
 interface StringOptions{
     notOnlyNumbers?: boolean
     noSpaces?: boolean
-}
-
-export enum MessageTypes{
-    log,
-    message,
-}
-
-export interface ElementMap{
-    [key: number]: HTMLElement;
-}
-
-export interface GapExtraction{
-    gaps: Array<Gap>
-    text: string
 }
 
 export function textToNewSnippet(text: string): Snippet{

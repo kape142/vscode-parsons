@@ -25,7 +25,6 @@ export default class ParsonViewer{
     
 
     message(message: {type: string, text: string}): void{
-        //this.fetcher.log("message received: "+JSON.stringify(message));
         switch (message.type) {
 			case 'update':
 				const text = message.text;
@@ -39,14 +38,12 @@ export default class ParsonViewer{
     }
     
     showFile(filename: string){
-        this.fetcher.log("show: "+filename);
         document.getElementById(`exercise-file-${this.shownFile}`)?.classList.remove("file-show");
         document.getElementById(`exercise-file-${filename}`)?.classList.add("file-show");
         this.shownFile = filename;
     }
 
     updateContent(text: string) {
-        this.log(text);
 		let exerciseAnswer: ExerciseAnswer;
 		try {
 			exerciseAnswer = parseExerciseAnswer(text);
@@ -57,11 +54,9 @@ export default class ParsonViewer{
 			return;
 		}
         const exercise = exerciseAnswer.exercise;
-        this.log(exercise);
 		this.code.style.display = '';
 		this.errorContainer.style.display = 'none';
 
-		// Render the code
 		this.code.innerHTML = '';
         for (const file of exercise.files) {
             if(!this.shownFile){
@@ -95,7 +90,6 @@ export default class ParsonViewer{
             this.snippetMap[snip.id] = snip;
         }
         
-        //this.fetcher.log(exerciseAnswer);
         for(const answer of exerciseAnswer.answers){
             let el = document.getElementById(`gap-${answer.gap.id}`);
             if(el){

@@ -1,7 +1,5 @@
 import { Gap, UncompiledGap } from "../GapSupport/GapModel";
 import { CodeLine } from "../model";
-import { javaCommentParser } from "./Languages/Java";
-import { pythonCommentParser } from "./Languages/Python";
 
 export type ImplementedLanguage = "java" | "python";
 

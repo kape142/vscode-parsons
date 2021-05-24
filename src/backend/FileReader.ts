@@ -1,16 +1,9 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
 import {accessSync, constants, readFileSync, readdirSync, mkdirSync, lstatSync} from 'fs';
-import {SavedExerciseAnswer, ExerciseAnswer, Exercise, ExerciseFile} from '../model';
-import { workspace } from 'vscode';
-/* TODO:
- * Check for full path
- * (check for url)
- */
+import {SavedExerciseAnswer, ExerciseAnswer } from '../model';
 
 export function readParsonFileToString(filename: string, workspaceroot: string): string{
     const filepath = path.join(workspaceroot, filename);
-    //console.log("readParsonFile", filepath);
     if(fileExists(filepath)){
         const text = readFileSync(filepath, 'utf-8');
         return loadExercisesToString(text, workspaceroot);
@@ -20,7 +13,6 @@ export function readParsonFileToString(filename: string, workspaceroot: string):
 
 export function readParsonFile(filename: string, workspaceroot: string): ExerciseAnswer{
     const filepath = path.join(workspaceroot, filename);
-    //console.log("readParsonFile", filepath);
     if(fileExists(filepath)){
         const text = readFileSync(filepath, 'utf-8');
         return loadExercises(JSON.parse(text) as SavedExerciseAnswer, workspaceroot);
@@ -33,7 +25,6 @@ export function loadExercises(parson: SavedExerciseAnswer, workspaceroot: string
         const filename = path.join(workspaceroot, `${parson.parsonDef}.parsondef`);
         if(fileExists(filename)){
             const fileRead = readFileSync(filename, 'utf-8');
-            //console.log("read:", fileRead);
             const exerciseAnswer: ExerciseAnswer = {
                 exercise: JSON.parse(fileRead),
                 answers: parson.answers
@@ -52,7 +43,6 @@ export function loadExercisesToString(text: string, workspaceroot: string): stri
         const filename = path.join(workspaceroot, `${parsed.parsonDef}.parsondef`);
         if(fileExists(filename)){
             const fileRead = readFileSync(filename, 'utf-8');
-            //console.log("read:", fileRead);
             const exerciseAnswer: ExerciseAnswer = {
                 exercise: JSON.parse(fileRead),
                 answers: parsed.answers       
@@ -61,11 +51,6 @@ export function loadExercisesToString(text: string, workspaceroot: string): stri
         }
     }
     return JSON.stringify(parsed);
-}
-
-export function getFilesFromText(text: string): string[]{
-    const parsed: ExerciseAnswer = JSON.parse(text);
-    return parsed.exercise.files.map(file => file.name);
 }
 
 export function getParsonFilesInFolder(filePath: string, previousPath?: string): string[]{
@@ -78,14 +63,7 @@ export function getParsonFilesInFolder(filePath: string, previousPath?: string):
         let a = files
             .filter(file => file.includes(".parson") && file !== ".parson")
             .concat(subFolderFiles)
-            .map(filename => {
-                console.log(files);
-                console.log(filename);
-                console.log(filePath);
-                console.log(previousPath);
-                return previousPath? path.join(previousPath, filename) : filename;}
-                );
-        //console.log(filePath, previousPath, files, subFolderFiles, a);
+            .map(filename => previousPath? path.join(previousPath, filename) : filename);
         return a;
     }
     return [];
@@ -94,7 +72,7 @@ export function getParsonFilesInFolder(filePath: string, previousPath?: string):
 export function getCodeFilesInFolder(filePath: string): string[]{
     if(fileExists(filePath)){
         const files = readdirSync(filePath);
-        return files.filter(file => !file.endsWith(".parson") && file !== "parsonconfig.json");
+        return files.filter(file => !lstatSync(path.join(filePath, file)).isDirectory() && !file.endsWith(".parson") && file !== "parsonconfig.json");
     }
     return [];
 }

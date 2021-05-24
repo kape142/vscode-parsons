@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { generateNonce, nonce } from '../util';
-import { loadExercisesToString, getFilesFromText, loadExercises, readParsonFileToString } from './FileReader';
-import { SavedExerciseAnswer, Answer, ExerciseAnswer, DisposableWrapper} from '../model';
+import { loadExercisesToString, loadExercises, readParsonFileToString } from './FileReader';
+import { SavedExerciseAnswer, Answer, DisposableWrapper} from '../model';
 import { ParsonDecorationProvider } from './ParsonDecorationProvider';
 
 
@@ -44,7 +44,6 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 
 		const parson = loadExercises(JSON.parse(document.getText()), workspaceroot);
 		this.currentFileMap[document.uri.fsPath.substring(workspaceroot.length+1)] = parson.exercise.files[0].name;
-		console.log("init curfile" , this.currentFileMap,document.uri.fsPath , document.uri.fsPath.substring(workspaceroot.length+1), parson.exercise.files[0].name);
 		
 		webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview);
 
@@ -55,27 +54,16 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 				text,
 			});
 		}
-
-		// Hook up event handlers so that we can synchronize the webview with the text document.
-		//
-		// The text document acts as our model, so we have to sync change in the document to our
-		// editor and sync changes in the editor back to the document.
-		// 
-		// Remember that a single text document can also be shared between multiple custom
-		// editors (this happens for example when you split a custom editor)
-
 		const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
 			if (e.document.uri.toString() === document.uri.toString()) {
 				updateWebview();
 			}
 		});
 
-		// Make sure we get rid of the listener when our editor is closed.
 		webviewPanel.onDidDispose(() => {
 			changeDocumentSubscription.dispose();
 		});
 
-		// Receive message from the webview.
 		webviewPanel.webview.onDidReceiveMessage(e => {
 			switch (e.type) {
 				case 'log':
@@ -93,7 +81,6 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 	}
 
 	public showFile(fileName: string, uri: string): void{
-		console.log("show file click", fileName, uri);
 		this.currentFileMap[uri] = fileName;
 		vscode.commands.executeCommand(
 			"vscode.openWith",
@@ -107,9 +94,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 	}
 
 	public updateFile(uri: string): void{
-		console.log("update file send", uri);
 		const updatedfile = readParsonFileToString(uri, this.workspaceroot);
-		console.log(updatedfile);
 		let sendMessage = this.postMessage.get(uri);
 		if(sendMessage){
 			sendMessage({type: "update", text: updatedfile});
@@ -119,13 +104,11 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 	private removeAnswer(snippetId: string, document: vscode.TextDocument){
 		const parson: SavedExerciseAnswer = this.getDocumentAsSavedExerciseAnswer(document);
 		parson.answers = parson.answers.filter(answer => answer.snippet.id !==snippetId);
-		console.log(parson.answers, snippetId);
 		this.updateParsonDefFile(document, parson);
 	}
 
 	private addAnswer(answer: Answer, document: vscode.TextDocument){
 		const parson: SavedExerciseAnswer = this.getDocumentAsSavedExerciseAnswer(document);
-		console.log(parson.answers);
 		if(answer.snippet.id === ""){
 			answer.snippet.id = generateNonce();
 			parson.answers = parson.answers.filter(a => a.gap.id !== answer.gap.id && a.snippet.id !== answer.snippet.id);
@@ -138,7 +121,6 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 			}
 		}
 		parson.answers.push(answer);
-		console.log(parson.answers, answer);
 		this.updateParsonDefFile(document, parson);
 	}
 
@@ -148,19 +130,14 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 
 	private updateParsonDefFile(document: vscode.TextDocument, json: SavedExerciseAnswer){
 		const edit = new vscode.WorkspaceEdit();
-		//console.log(document.uri);
-		//console.log(path.normalize(document.uri.fsPath), path.normalize(this.workspaceroot));
 		const fileUri = document.uri.fsPath.substring(this.workspaceroot.length+1);
-		//console.log(fileUri, this.currentFileMap);
 		const parsonUri = vscode.Uri.parse(`parson:${path.join(fileUri, this.currentFileMap[fileUri] || "")}`);
-		//console.log(parsonUri);
 		this.decorator.fileChangeEmitter.fire(parsonUri);
 		edit.replace(document.uri, new vscode.Range(0,0,document.lineCount, 0), JSON.stringify(json, null, 4));
 		vscode.workspace.applyEdit(edit);
 	}
 
     private getHtmlForWebview(webview: vscode.Webview): string {
-		// Local path to script and css for the webview
 		const scriptUri = webview.asWebviewUri(vscode.Uri.file(
 			path.join(this.context.extensionPath, 'dist', 'webView.js')
 		));

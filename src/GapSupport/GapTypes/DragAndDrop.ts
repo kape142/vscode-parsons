@@ -1,6 +1,7 @@
 import { Answer, Snippet } from "../../model";
-import { extractSnippetsFromGap, generateNonce, textToNewSnippet } from "../../util";
+import { extractSnippetsFromGap, generateNonce } from "../../util";
 import { CompiledGap, GapType, UncompiledGap } from "../GapModel";
+import "./DragAndDrop.less";
 
 export const dragDrop: GapType = {
     compile(gap: UncompiledGap){
@@ -8,7 +9,6 @@ export const dragDrop: GapType = {
             throw new Error(`Gap of type "${gap.type}" sent to DragDropCompiler`);
         }
         const snippets = extractSnippetsFromGap(gap);
-        console.log(snippets);
         return {
             gap: {
                 id: generateNonce(),
@@ -37,8 +37,6 @@ export const dragDrop: GapType = {
             if(snippetJson){
                 const snip = JSON.parse(snippetJson) as Snippet;
                 let answer: Answer = {gap: gap, snippet: snip};
-                console.log(answer);
-                message(answer, "log");
                 message(answer, "add answer");
             }
         };

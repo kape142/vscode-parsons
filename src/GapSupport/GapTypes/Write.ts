@@ -1,6 +1,7 @@
 import { Answer, Snippet } from "../../model";
-import { generateNonce, textToNewSnippet } from "../../util";
+import { generateNonce } from "../../util";
 import { CompiledGap, GapType, UncompiledGap } from "../GapModel";
+import "./Write.less";
 
 export const write: GapType = {
     compile(gap: UncompiledGap){

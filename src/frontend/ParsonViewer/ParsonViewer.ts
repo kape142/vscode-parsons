@@ -1,5 +1,8 @@
-import {Exercise, ExerciseAnswer, Gap, Fetcher, Highlighter, Snippet, Answer} from "../../model";
-import {parseExerciseAnswer, ElementMap} from "../../util";
+import { CompiledGap } from "../../GapSupport/GapModel";
+import { applyHtmlElementBehaviour, createHtmlGapObject, loadAnswerToHtmlElement } from "../../GapSupport/GapTypeHelper";
+import { fileNameToLanguage } from "../../LanguageSupport/LanguageHelper";
+import {ExerciseAnswer, Fetcher, Highlighter, Snippet} from "../../model";
+import { parseExerciseAnswer} from "../../util";
 import "./ParsonViewer.less";
 
 export default class ParsonViewer{
@@ -16,13 +19,12 @@ export default class ParsonViewer{
 
     shownFile?: string;
 
-    selectedSnippet?: Snippet;
+    
 
-    snippetMap: ElementMap = {};
+    snippetMap: {[key: string]: Snippet} = {};
     
 
     message(message: {type: string, text: string}): void{
-        this.fetcher.log("message received: "+JSON.stringify(message));
         switch (message.type) {
 			case 'update':
 				const text = message.text;
@@ -36,7 +38,6 @@ export default class ParsonViewer{
     }
     
     showFile(filename: string){
-        this.fetcher.log("show: "+filename);
         document.getElementById(`exercise-file-${this.shownFile}`)?.classList.remove("file-show");
         document.getElementById(`exercise-file-${filename}`)?.classList.add("file-show");
         this.shownFile = filename;
@@ -56,93 +57,83 @@ export default class ParsonViewer{
 		this.code.style.display = '';
 		this.errorContainer.style.display = 'none';
 
-		// Render the code
 		this.code.innerHTML = '';
-		for (const file of exercise.files) {
+        for (const file of exercise.files) {
             if(!this.shownFile){
                 this.showFile(file.name);
             }
-            file.gaps.forEach(gap => {
-                //this.fetcher.log(gap.id);
-                file.text = file.text.replace(new RegExp(`(<.*>)?\\$(<.*>)?parson(<.*>)?{(<.*>)?${gap.id}(<.*>)?}`), `/*${gap.id}*/`);
-            });
-            this.fetcher.log(file.text);
-            const highlightedCode = this.highlighter.addHighlighting("java", file.text);
+            let highlightedCode = this.highlighter.addHighlighting(fileNameToLanguage(file.name), file.text);
+
             const element = document.createElement('div');
             element.className = 'file';
             element.id = `exercise-file-${file.name}`;
 			this.code.appendChild(element);
             let innerHTML = highlightedCode;
-            this.fetcher.log(highlightedCode);
+            
             file.gaps.forEach(gap => {
-                //this.fetcher.log(gap.id);
-                innerHTML = innerHTML.replace(new RegExp(`(<span class="hljs-comment">)?\\/\\*(<span class="hljs-title">)?${gap.id}(</span>)?\\*\\/(</span>)?`), this.createGapObject(gap));
+                innerHTML = innerHTML.replace(gap.id, this.createGapObject(gap));
             });
-            this.fetcher.log(innerHTML);
             element.innerHTML = innerHTML;
 		}
 
         this.snippets.innerHTML = "";
         for(const snip of exercise.snippets){
             let el = document.createElement("div");
+            el.id = `snippet-${snip.id}`;
             el.className = "snippet";
             el.textContent = snip.text;
-            el.onclick = (event)=>{
-                if(this.selectedSnippet){
-                    this.snippetMap[this.selectedSnippet.id].classList.remove("snippet-selected");
-                    if(this.selectedSnippet.text === snip.text){
-                        this.selectedSnippet = undefined;
-                        return;
-                    }
-                }
-                this.selectedSnippet = snip;
-                el.classList.add("snippet-selected");
+            el.draggable = true;
+            el.ondragstart = (ev: DragEvent) => {
+                ev.dataTransfer?.setData("text/plain", JSON.stringify(snip));
             };
             this.snippets.appendChild(el);
-            this.snippetMap[snip.id] = el;
+            this.snippetMap[snip.id] = snip;
         }
         
-        //this.fetcher.log(exerciseAnswer);
         for(const answer of exerciseAnswer.answers){
             let el = document.getElementById(`gap-${answer.gap.id}`);
             if(el){
-                this.snippetMap[answer.snippet.id].style.display = "none";
-                el.classList.add("filled");
-                el.innerText = answer.snippet.text;
+                loadAnswerToHtmlElement(answer, el);
+                el.classList.add("gap-filled");
+                let snip = document.getElementById(`snippet-${answer.snippet.id}`);
+                if(snip){
+                    snip.style.display = "none";
+                    el.dataset.snippet = JSON.stringify(answer.snippet);
+                }
             }
         }
 
-        exerciseAnswer.exercise.files.forEach(file => {
+        exercise.files.forEach(file => {
             file.gaps.forEach(gap => {
-                let el = document.getElementById(`gap-${gap.id}`);
-                if(el){
-                    el.onclick = (event) => {
-                        if(el?.innerText.trim() !== ""){
-                            this.fetcher.message(gap.id, "remove answer");
-                        }
-                        if(this.selectedSnippet){
-                            let answer: Answer = {gap: gap, snippet: this.selectedSnippet};
-                            this.fetcher.message(answer, "add answer");
-                            this.selectedSnippet = undefined;
-                        }
-                    };
-                }
+                let el = document.getElementById(`gap-${gap.id}`)!;
+                applyHtmlElementBehaviour(gap, el, (data: string | object, type?: string)=>{this.fetcher.message(data, type);});
             });
         });
+
+        this.snippets.ondragover = (ev: DragEvent) => {
+            ev.preventDefault();
+            if(ev.dataTransfer){
+                ev.dataTransfer.dropEffect = "move";
+            }
+        };
+        this.snippets.ondrop = (ev: DragEvent) => {
+            ev.preventDefault();
+            const snippetJson = ev.dataTransfer?.getData("text/plain");
+            if(snippetJson){
+                const snip = JSON.parse(snippetJson) as Snippet;
+                this.fetcher.message(`${snip.id}`, "remove answer");
+            }
+        };
+
         document.getElementById(`exercise-file-${this.shownFile}`)?.classList.add("file-show");
 	}
 
-    createGapObject(gap: Gap){
-        let a =  `<span id="gap-${gap.id}" class="gap width-${gap.width}"> </span>`;
-        //this.fetcher.log(a);
-        return a;
+    createGapObject(gap: CompiledGap){
+        return createHtmlGapObject(gap);
     }
 
-    createCodeLineSegment(line: string){
-        const textContent = document.createElement('span');
-        textContent.innerText = line;
-        textContent.className = "codeline";
-        return textContent;
+    private log(...it: Array<string | object>){
+        it.forEach(it => this.fetcher.log(it));
     }
     
 }

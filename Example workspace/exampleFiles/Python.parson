@@ -1,0 +1,53 @@
+{
+    "parsonDef": ".parson\\Python",
+    "answers": [
+        {
+            "gap": {
+                "id": "EPHkOXHWYQDO",
+                "width": 10,
+                "type": "dropdown",
+                "options": [
+                    "num1",
+                    "num2",
+                    "num3"
+                ]
+            },
+            "snippet": {
+                "text": "num1",
+                "id": "dquZlOcfaIEs"
+            }
+        },
+        {
+            "gap": {
+                "id": "boiVqehjZDvM",
+                "width": 10,
+                "type": "dropdown",
+                "options": [
+                    "num1",
+                    "num2",
+                    "num3"
+                ]
+            },
+            "snippet": {
+                "text": "num2",
+                "id": "kmDTLZOIiTSc"
+            }
+        },
+        {
+            "gap": {
+                "id": "jmHzInElHfHr",
+                "width": 10,
+                "type": "dropdown",
+                "options": [
+                    "num1",
+                    "num2",
+                    "num3"
+                ]
+            },
+            "snippet": {
+                "text": "num3",
+                "id": "xooZezMuZZQy"
+            }
+        }
+    ]
+}

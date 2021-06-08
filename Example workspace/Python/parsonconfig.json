@@ -1,0 +1,14 @@
+{
+    "output": {
+        "parson": "exampleFiles",
+        "parsondef": ".parson",
+        "code": "dist/python"
+    },
+    "name": "Python",
+    "includesSolution": false,
+    "runnable": true,
+    "runCommands": [
+        "cd dist/python",
+        "python test.py"
+    ]
+}

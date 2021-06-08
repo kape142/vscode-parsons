@@ -1,0 +1,48 @@
+{
+    "name": "Python",
+    "files": [
+        {
+            "name": "test.py",
+            "text": "# Python program to find the largest number among the three input numbers\r\n\r\nnum1 = float(input(\"Enter first number: \"))\r\nnum2 = float(input(\"Enter second number: \"))\r\nnum3 = float(input(\"Enter third number: \"))\r\n\r\nif (num1 >= num2) and (num1 >= num3):\r\n   largest = EPHkOXHWYQDO\r\nelif (num2 >= num1) and (num2 >= num3):\r\n   largest = boiVqehjZDvM\r\nelse:\r\n   largest = jmHzInElHfHr\r\n\r\nprint(\"The largest number is\", largest)",
+            "gaps": [
+                {
+                    "id": "EPHkOXHWYQDO",
+                    "width": 10,
+                    "type": "dropdown",
+                    "options": [
+                        "num1",
+                        "num2",
+                        "num3"
+                    ]
+                },
+                {
+                    "id": "boiVqehjZDvM",
+                    "width": 10,
+                    "type": "dropdown",
+                    "options": [
+                        "num1",
+                        "num2",
+                        "num3"
+                    ]
+                },
+                {
+                    "id": "jmHzInElHfHr",
+                    "width": 10,
+                    "type": "dropdown",
+                    "options": [
+                        "num1",
+                        "num2",
+                        "num3"
+                    ]
+                }
+            ]
+        }
+    ],
+    "snippets": [],
+    "runnable": true,
+    "output": "dist/python",
+    "runCommands": [
+        "cd dist/python",
+        "python test.py"
+    ]
+}

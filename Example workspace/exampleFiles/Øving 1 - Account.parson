@@ -1,4 +1,15 @@
 {
-    "parsonDef": "Øving 1 - Account",
-    "answers": []
+    "parsonDef": ".parson\\Øving 1 - Account",
+    "answers": [
+        {
+            "gap": {
+                "id": "setInterestRate",
+                "width": 28
+            },
+            "snippet": {
+                "text": "int interestRate",
+                "id": 2
+            }
+        }
+    ]
 }

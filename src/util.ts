@@ -1,10 +1,16 @@
-import { Exercise, ExerciseFile, Gap, Snippet, ExerciseAnswer, SavedExerciseAnswer} from "./model";
+import { CompiledGap, Gap, UncompiledGap } from "./GapSupport/GapModel";
+import { Exercise, ExerciseFile, Snippet, ExerciseAnswer } from "./model";
+
+export let nonce = generateNonce(32);
 
 
-export let nonce = '';
-const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-for (let i = 0; i < 32; i++) {
-    nonce += possible.charAt(Math.floor(Math.random() * possible.length));
+export function generateNonce(length: number = 12){
+    let n = "";
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    for (let i = 0; i < length; i++) {
+        n += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return n;
 }
 
 /* TODO:
@@ -20,6 +26,8 @@ export function parseExerciseAnswer(text: string): ExerciseAnswer{
 /* TODO:
  * Validate that all gap ids are unique
  * Validate that all gap ids are present in the code and vice versa
+ * Update with model changes
+ * Use more often
  */
 export function parseExercise(text: string): Exercise{
     const parsed: Exercise = JSON.parse(text);
@@ -71,7 +79,7 @@ export function verifySnippet(snippet: Snippet){
     }
 }
 
-export function verifyGap(gap: Gap){
+export function verifyGap(gap: CompiledGap){
     try{
         if(gap === undefined){
             throw new Error("Gap object is not defined");
@@ -108,13 +116,20 @@ interface StringOptions{
     noSpaces?: boolean
 }
 
-export enum MessageTypes{
-    log,
-    message,
-    
+export function textToNewSnippet(text: string): Snippet{
+    return {
+        text,
+        id: generateNonce()
+    };
 }
 
-
-export interface ElementMap{
-    [key: number]: HTMLElement;
+export function extractSnippetsFromGap(gap: UncompiledGap): Array<Snippet>{
+    const snippets = [{
+        text: gap.text,
+        id: generateNonce()
+    }];
+    if(gap.options){
+        snippets.push(...gap.options.map(textToNewSnippet));
+    }
+    return snippets.sort((a,b)=> a.id.localeCompare(b.id));
 }

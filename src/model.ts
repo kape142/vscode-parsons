@@ -1,39 +1,37 @@
+import * as vscode from 'vscode';
+import { CompiledGap } from './GapSupport/GapModel';
+
 export interface Exercise{
     name: string
     snippets: Array<Snippet>
     files: Array<ExerciseFile>
+    runnable: boolean,
+    output?: string,
+    runCommands?: Array<string>
 }
 
 export interface ExerciseFile{
     text: string
     name: string
-    gaps: Array<Gap>
+    gaps: Array<CompiledGap>
 }
 
 export interface Snippet{
     text: string,
-    id: number
-}
-
-export interface Gap{
     id: string
-    width: number
-    type: "dragdrop" | "dropdown" | "write"
 }
 
 export interface Answer{
-    gap: Gap
+    gap: CompiledGap
     snippet: Snippet
 }
 
 export interface SavedExerciseAnswer{
-    //customSnippets: Array<Snippet>
     parsonDef: Exercise | string
     answers: Array<Answer>
 }
 
 export interface ExerciseAnswer{
-    //customSnippets: Array<Snippet>
     exercise: Exercise
     answers: Array<Answer>
 }
@@ -48,15 +46,28 @@ export interface SnippetDirectory{
 export interface ParsonConfig{
     output: {
         parson: string
-        parsondef: string
+        parsondef: string,
+        code?: string
     }
     name: string
     filename?: string
-    includesSolution?: boolean
+    includesSolution: boolean,
+    runnable: boolean,
+    runCommands?: Array<string>
 }
 
 export interface GapDirectory{
-    [key:string]: Array<Gap>
+    [key:string]: Array<CompiledGap>
+}
+
+export interface DisposableWrapper<T>{
+    it : T
+    disposable: vscode.Disposable
+}
+
+export interface CodeLine{
+    text: string,
+    lineNumber: number
 }
 
 export interface Fetcher{

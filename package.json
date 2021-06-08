@@ -1,16 +1,16 @@
 {
-	"name": "webpack-test",
-	"displayName": "webpack-test",
+	"name": "vscode-parsons",
+	"displayName": "VS Code Parsons",
 	"description": "",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"engines": {
 		"vscode": "^1.53.0"
 	},
 	"categories": [
-		"Other"
+		"Education"
 	],
 	"activationEvents": [
-		"onCustomEditor:testExtension.parsonViewer",
+		"onCustomEditor:vscodeparsons.parsonViewer",
         "onView:parsonExplorer",
 		"onCommand:vscodeparsons.fileToProblem",
 		"onCommand:vscodeparsons.folderToProblem",
@@ -18,9 +18,26 @@
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
+		"configuration": {
+			"title": "VS Code Parsons",
+			"properties": {
+				"vscodeparsons.enableRefreshing": {
+					"type": "boolean",
+					"scope": "application",
+					"default": false,
+					"description": "Enable refreshing the Parson Explorer and Parson files for development of exercises"
+				},
+				"vscodeparsons.listenForChanges": {
+					"type": "boolean",
+					"scope": "application",
+					"default": false,
+					"description": "Automatically export changes to .parson files whenever a file is saved in a folder which includes a parsonconfig.json"
+				}
+			}
+		},
 		"customEditors": [
 			{
-				"viewType": "testExtension.parsonViewer",
+				"viewType": "vscodeparsons.parsonViewer",
 				"displayName": "Parson Viewer",
 				"selector": [
 					{
@@ -41,6 +58,25 @@
 			{
 				"command": "vscodeparsons.exportFile",
 				"title": "Export Parsons Problem to file"
+			},
+			{
+				"command": "vscodeparsons.registerGap",
+				"title": "Make a gap from the currently selected text"
+			},
+			{
+				"command": "vscodeparsons.refreshEntries",
+				"title": "Refresh list of entries in the Parson Explorer",
+				"icon": "$(extensions-refresh)"
+			},
+			{
+				"command": "vscodeparsons.refreshEntry",
+				"title": "Refresh the contents of this file",
+				"icon": "$(extensions-refresh)"
+			},
+			{
+				"command": "vscodeparsons.compileAndRun",
+				"title": "Compile the code in this task with the given answers and run the code",
+				"icon": "$(notebook-execute)"
 			}
 		],
 		"views": {
@@ -48,6 +84,27 @@
 				{
 					"id": "parsonExplorer",
 					"name": "Parson Explorer"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "vscodeparsons.refreshEntries",
+					"when": "view == parsonExplorer && config.vscodeparsons.enableRefreshing == true",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "vscodeparsons.refreshEntry",
+					"when": "view == parsonExplorer && viewItem =~ /[A-z]*[eE]xercise/ && config.vscodeparsons.enableRefreshing == true",
+					"group": "inline"
+				},
+				{
+					"command": "vscodeparsons.compileAndRun",
+					"when": "view == parsonExplorer && viewItem == runnableExercise",
+					"group": "inline"
 				}
 			]
 		}

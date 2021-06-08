@@ -10,7 +10,7 @@ export default class Highlight implements Highlighter{
 
     addHighlighting(lang: string, text: string){
         try{
-            const highlightResult = highlight.highlight("java", text, true);
+            const highlightResult = highlight.highlight(lang, text, true);
             return highlightResult.value;
         }catch(error){
             this.fetcher.log(error);

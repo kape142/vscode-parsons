@@ -1,4 +1,3 @@
-import { ThemeIcon } from 'vscode';
 import {Fetcher, Highlighter} from "../../model";
 import ParsonViewer from '../ParsonViewer/ParsonViewer';
 import Highlight from "../Highlight/Highlight";
@@ -19,14 +18,15 @@ const highlighter: Highlighter = new Highlight(fetcher);
 const parsonViewer = new ParsonViewer(fetcher, highlighter);
 
 window.addEventListener('message', event => {
-    const message = event.data; // The json data that the extension sent
-    fetcher.log("message event: " +JSON.stringify(message));
+    const message = event.data;
     parsonViewer.message(message);
-
+    const state = vscode.getState() || {};
     switch (message.type) {
         case 'update':
-            vscode.setState({ text: message.text });
+            vscode.setState(Object.assign(state, {text: message.text}));
             return;
+        case 'show file':
+            vscode.setState(Object.assign(state, {showFile: message.text}));
     }
     
 });
@@ -34,6 +34,6 @@ window.addEventListener('message', event => {
 
 const state = vscode.getState();
 	if (state) {
-        fetcher.log("state: "+ JSON.stringify(state));
 		parsonViewer.message({type: "update", text: state.text});
+		parsonViewer.message({type: "show file", text: state.showFile});
 	}

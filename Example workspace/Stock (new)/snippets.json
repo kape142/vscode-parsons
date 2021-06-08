@@ -1,0 +1,17 @@
+{
+    "dragdrop": [
+        "firePriceChanged(oldPrice)",
+        "listeners.add(listener)",
+        "this",
+        "oldPrice",
+        "this.price",
+        "s.addStockListener(this)",
+        "this.index += s.getPrice()",
+        "@Override",
+        "Stock stock",
+        "double oldPrice",
+        "double newPrice",
+        "implements StockListener",
+        "getPrice"
+    ]
+}

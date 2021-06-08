@@ -17,7 +17,7 @@ export class ParsonViewerProvider implements vscode.CustomTextEditorProvider {
 		return {it: provider, disposable: providerRegistration};
 	}
 
-    private static readonly viewType = 'testExtension.parsonViewer';
+    private static readonly viewType = 'vscodeparsons.parsonViewer';
 	private postMessage: Map<string, (message?: {type: string, text: string}) => void> = new Map();
 	private currentFileMap: {[key: string]: string} = {};
 

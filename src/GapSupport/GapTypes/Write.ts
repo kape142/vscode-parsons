@@ -17,7 +17,7 @@ export const write: GapType = {
         };
     },
     createHtmlGapObject(gap: CompiledGap): string{
-        return `<input id="gap-${gap.id}" class="gap gap-write width-${gap.width}"> </input>`;
+        return `<input type="text" id="gap-${gap.id}" class="gap gap-write width-${gap.width}"> </input>`;
     },
     applyHtmlElementBehaviour(gap: CompiledGap, el: HTMLElement, message: (data: string | object, type?: string) => void): void{
         const input: HTMLInputElement= el as HTMLInputElement;

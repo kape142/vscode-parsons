@@ -3,20 +3,20 @@
     "files": [
         {
             "name": "Stock.java",
-            "text": "import java.util.ArrayList;\r\nimport java.util.List;\r\n\r\npublic class Stock {\r\n    \r\n    private final String ticker;\r\n    private double price;\r\n    private List<StockListener> listeners = new ArrayList<StockListener>();\r\n    \r\n    public Stock(String ticker, double price) {\r\n        this.ticker = ticker;\r\n        this.price = price;\r\n    }\r\n\r\n    public double getPrice() {\r\n        return this.price;\r\n    }\r\n\r\n    public void setPrice(double newPrice) {\r\n        double oldPrice = this.price;\r\n        this.price = newPrice;\r\n        if (this.price != oldPrice) {\r\n            JmjEkXsLvOnL;\r\n        }\r\n    }\r\n    \r\n    public void addStockListener(StockListener listener) {\r\n        vGXIhiXSGGDi;\r\n    }\r\n\r\n    ZpPSxXtOfqqc\r\n    public String toString() {\r\n        return this.ticker+\": \"+this.price;\r\n    }\r\n    \r\n    protected void firePriceChanged(double oldPrice) {\r\n        for (StockListener listener : listeners) {\r\n            listener.stockPriceChanged(RyEUhSPmIuVh, nswPxAvgNpcr, wcfVsAzsmith);\r\n        }\r\n    }\r\n}\r\n",
+            "text": "import java.util.ArrayList;\r\nimport java.util.List;\r\n\r\npublic class Stock {\r\n    \r\n    private final String ticker;\r\n    private double price;\r\n    private List<StockListener> listeners = new ArrayList<StockListener>();\r\n    \r\n    public Stock(String ticker, double price) {\r\n        this.ticker = ticker;\r\n        this.price = price;\r\n    }\r\n\r\n    public double getPrice() {\r\n        return this.price;\r\n    }\r\n\r\n    public void setPrice(double newPrice) {\r\n        double oldPrice = this.price;\r\n        this.price = newPrice;\r\n        if (this.price != oldPrice) {\r\n            bNZoHDZfPuam;\r\n        }\r\n    }\r\n    \r\n    public void addStockListener(StockListener listener) {\r\n        oaRnRdeLZmPv;\r\n    }\r\n\r\n    FCMSfzlOUCOK\r\n    public String toString() {\r\n        return this.ticker+\": \"+this.price;\r\n    }\r\n    \r\n    protected void firePriceChanged(double oldPrice) {\r\n        for (StockListener listener : listeners) {\r\n            listener.stockPriceChanged(JDhNVyptakMe, oREPNRqnCVMj, OtVDseobsyAb);\r\n        }\r\n    }\r\n}\r\n",
             "gaps": [
                 {
-                    "id": "JmjEkXsLvOnL",
+                    "id": "bNZoHDZfPuam",
                     "width": 52,
                     "type": "dragdrop"
                 },
                 {
-                    "id": "vGXIhiXSGGDi",
+                    "id": "oaRnRdeLZmPv",
                     "width": 46,
                     "type": "dragdrop"
                 },
                 {
-                    "id": "ZpPSxXtOfqqc",
+                    "id": "FCMSfzlOUCOK",
                     "width": 22,
                     "type": "dropdown",
                     "options": [
@@ -26,17 +26,17 @@
                     ]
                 },
                 {
-                    "id": "RyEUhSPmIuVh",
+                    "id": "JDhNVyptakMe",
                     "width": 20,
                     "type": "dragdrop"
                 },
                 {
-                    "id": "nswPxAvgNpcr",
+                    "id": "oREPNRqnCVMj",
                     "width": 20,
                     "type": "dragdrop"
                 },
                 {
-                    "id": "wcfVsAzsmith",
+                    "id": "OtVDseobsyAb",
                     "width": 20,
                     "type": "dragdrop"
                 }
@@ -44,25 +44,25 @@
         },
         {
             "name": "StockIndex.java",
-            "text": "import java.util.ArrayList;\r\nimport java.util.List;\r\nimport java.util.Arrays;\r\n\r\npublic class StockIndex jPAnvkgUNVPe {\r\n\r\n    private List<Stock> stocks = new ArrayList<>();\r\n    private double index = 0;\r\n\r\n    public StockIndex(Stock... stocks) {\r\n        this.stocks.addAll(List.of(stocks));\r\n        for (Stock s : stocks) {\r\n            aIPNxFQzRsYK;\r\n            pgevxQsXqxOb;\r\n        }\r\n    }\r\n\r\n    hOzRSGBTPVDO\r\n    public void stockPriceChanged(lFaQOtcTvbel, twIFcXFsTrhu, XZPgnWoIxCHn) {\r\n        this.index += newPrice - oldPrice;\r\n    }\r\n\r\n    public static void main(String[] args){\r\n        Stock tesla = new Stock(\"TSLA\", 100.0);\r\n        Stock apple = new Stock(\"AAPL\", 200.0);\r\n        StockIndex stockIndex = new StockIndex(tesla, apple);\r\n        // should print 300.0\r\n        System.out.println(stockIndex.index);\r\n        tesla.setPrice(110.0);\r\n        // should print 310.0\r\n        System.out.println(stockIndex.index);\r\n    }\r\n}\r\n",
+            "text": "import java.util.ArrayList;\r\nimport java.util.List;\r\nimport java.util.Arrays;\r\n\r\npublic class StockIndex JVJSwgslqdCb {\r\n\r\n    private List<Stock> stocks = new ArrayList<>();\r\n    private double index = 0;\r\n\r\n    public StockIndex(Stock... stocks) {\r\n        this.stocks.addAll(List.of(stocks));\r\n        for (Stock s : stocks) {\r\n            rHAgCxuNSZtZ;\r\n            xRbIrbIGzUZY;\r\n        }\r\n    }\r\n\r\n    kwySQTJwWjMx\r\n    public void stockPriceChanged(ezRSclRTGNRD, tgMBAUHaXyqS, YrSJaqbNmxwN) {\r\n        this.index += newPrice - oldPrice;\r\n    }\r\n\r\n    public static void main(String[] args){\r\n        Stock tesla = new Stock(\"TSLA\", 100.0);\r\n        Stock apple = new Stock(\"AAPL\", 200.0);\r\n        StockIndex stockIndex = new StockIndex(tesla, apple);\r\n        // should print 300.0\r\n        System.out.println(stockIndex.index);\r\n        tesla.setPrice(110.0);\r\n        // should print 310.0\r\n        System.out.println(stockIndex.index);\r\n    }\r\n}\r\n",
             "gaps": [
                 {
-                    "id": "jPAnvkgUNVPe",
+                    "id": "JVJSwgslqdCb",
                     "width": 50,
                     "type": "write"
                 },
                 {
-                    "id": "aIPNxFQzRsYK",
+                    "id": "rHAgCxuNSZtZ",
                     "width": 50,
                     "type": "dragdrop"
                 },
                 {
-                    "id": "pgevxQsXqxOb",
+                    "id": "xRbIrbIGzUZY",
                     "width": 50,
                     "type": "dragdrop"
                 },
                 {
-                    "id": "hOzRSGBTPVDO",
+                    "id": "kwySQTJwWjMx",
                     "width": 22,
                     "type": "dropdown",
                     "options": [
@@ -72,17 +72,17 @@
                     ]
                 },
                 {
-                    "id": "lFaQOtcTvbel",
+                    "id": "ezRSclRTGNRD",
                     "width": 22,
                     "type": "dragdrop"
                 },
                 {
-                    "id": "twIFcXFsTrhu",
+                    "id": "tgMBAUHaXyqS",
                     "width": 30,
                     "type": "dragdrop"
                 },
                 {
-                    "id": "XZPgnWoIxCHn",
+                    "id": "YrSJaqbNmxwN",
                     "width": 30,
                     "type": "dragdrop"
                 }
@@ -97,51 +97,51 @@
     "snippets": [
         {
             "text": "firePriceChanged(oldPrice)",
-            "id": "VIjIspBZeQOv"
+            "id": "XmGejMUPdZki"
         },
         {
             "text": "listeners.add(listener)",
-            "id": "pFFAIkOyOjgd"
+            "id": "tiSOxylVfijg"
         },
         {
             "text": "this",
-            "id": "EQFvdeJYvkPQ"
+            "id": "NdSZAEIOFGIE"
         },
         {
             "text": "oldPrice",
-            "id": "iPlJplItHDrr"
+            "id": "YzjwHcmVQfXB"
         },
         {
             "text": "this.price",
-            "id": "dXvVjPwORhAT"
+            "id": "qTDWlnrWCVOP"
         },
         {
             "text": "s.addStockListener(this)",
-            "id": "VGghSFEDEipl"
+            "id": "WFcPipLWxpra"
         },
         {
             "text": "this.stocks.add(s)",
-            "id": "JNibVkTKYLjX"
+            "id": "MgHUfcmjxCPa"
         },
         {
             "text": "this.index += s.getPrice()",
-            "id": "pOhoCLRscGKw"
-        },
-        {
-            "text": "Stock stock",
-            "id": "pwlrEoEarcfE"
+            "id": "URYefVlGkAdp"
         },
         {
             "text": "String ticker",
-            "id": "UHiMEQdWFWSH"
+            "id": "CccGuGWdCQYC"
+        },
+        {
+            "text": "Stock stock",
+            "id": "rqDqVAkLRlOv"
         },
         {
             "text": "double oldPrice",
-            "id": "jsbrTWTDaBmC"
+            "id": "rAqZZualqJFh"
         },
         {
             "text": "double newPrice",
-            "id": "GeqLNArtEnJi"
+            "id": "ASbyJuXCVSez"
         }
     ],
     "runnable": true,

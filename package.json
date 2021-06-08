@@ -1,16 +1,16 @@
 {
-	"name": "webpack-test",
-	"displayName": "webpack-test",
+	"name": "vscode-parsons",
+	"displayName": "VS Code Parsons",
 	"description": "",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"engines": {
 		"vscode": "^1.53.0"
 	},
 	"categories": [
-		"Other"
+		"Education"
 	],
 	"activationEvents": [
-		"onCustomEditor:testExtension.parsonViewer",
+		"onCustomEditor:vscodeparsons.parsonViewer",
         "onView:parsonExplorer",
 		"onCommand:vscodeparsons.fileToProblem",
 		"onCommand:vscodeparsons.folderToProblem",
@@ -37,7 +37,7 @@
 		},
 		"customEditors": [
 			{
-				"viewType": "testExtension.parsonViewer",
+				"viewType": "vscodeparsons.parsonViewer",
 				"displayName": "Parson Viewer",
 				"selector": [
 					{
